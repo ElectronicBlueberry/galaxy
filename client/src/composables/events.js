@@ -3,8 +3,8 @@ import { onMounted, onBeforeUnmount } from "vue";
 function matchKeyEvent(key, modifiers, event) {
     if (key === event.key) {
         // check if all modifiers match the event
-        for (const [key, value] of Object.entries(modifiers ?? {})) {
-            if (event[key] !== value) {
+        for (const key of ["shiftKey", "ctrlKey", "altKey"]) {
+            if (event[key] !== Boolean(modifiers[key])) {
                 return false;
             }
         }
