@@ -14,8 +14,6 @@ onKeyUp("P", { shiftKey: true }, () => {
     if (!modalActive.value) {
         command.value = "";
         modal.value.show();
-    } else {
-        modal.value.hide();
     }
 });
 
