@@ -19,19 +19,17 @@ export function useKeyUp() {
     const callbacks = [];
 
     const onKeyUp = (key, modifiers, callbackFunction) => {
-        const callback = {
+        callbacks.push({
             key,
             modifiers,
             callbackFunction,
-        };
-
-        callbacks.push(callback);
+        });
     };
 
     const eventHandler = (e) => {
         callbacks.forEach((callback) => {
             if (matchKeyEvent(callback.key, callback.modifiers, e)) {
-                callback.callbackFunction();
+                callback.callbackFunction(e);
             }
         });
     };
@@ -45,4 +43,34 @@ export function useKeyUp() {
     });
 
     return { onKeyUp };
+}
+
+export function useKeyDown() {
+    const callbacks = [];
+
+    const onKeyDown = (key, modifiers, callbackFunction) => {
+        callbacks.push({
+            key,
+            modifiers,
+            callbackFunction,
+        });
+    };
+
+    const eventHandler = (e) => {
+        callbacks.forEach((callback) => {
+            if (matchKeyEvent(callback.key, callback.modifiers, e)) {
+                callback.callbackFunction(e);
+            }
+        });
+    };
+
+    onMounted(() => {
+        document.addEventListener("keydown", eventHandler);
+    });
+
+    onBeforeUnmount(() => {
+        document.removeEventListener("keydown", eventHandler);
+    });
+
+    return { onKeyDown };
 }
