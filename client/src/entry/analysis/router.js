@@ -62,6 +62,7 @@ import { CloudAuth } from "components/User/CloudAuth";
 import { ExternalIdentities } from "components/User/ExternalIdentities";
 import { HistoryExport } from "components/HistoryExport/index";
 import { StorageDashboardRouter } from "components/User/DiskUsage";
+import RestructureCollection from "components/Collections/common/RestructureCollection";
 
 Vue.use(VueRouter);
 
@@ -140,6 +141,11 @@ export function getRouter(Galaxy) {
                     {
                         path: "collection/:collection_id/edit",
                         component: CollectionEditView,
+                        props: true,
+                    },
+                    {
+                        path: "collection/:collection_id/restructure",
+                        component: RestructureCollection,
                         props: true,
                     },
                     {
