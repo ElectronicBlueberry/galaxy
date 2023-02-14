@@ -103,29 +103,36 @@
                             :items="itemsLoaded"
                             :query-key="queryKey"
                             @scroll="onScroll">
-                            <template v-slot:item="{ item, currentOffset }">
-                                <ContentItem
-                                    v-if="!invisible[item.hid]"
-                                    :id="item.hid"
-                                    is-history-item
+                            <template v-slot:item="{ item, active, index, currentOffset }">
+                                <DynamicScrollerItem
+                                    class="px-1 dynamic-scroller-item"
                                     :item="item"
-                                    :name="item.name"
-                                    :writable="writable"
-                                    :expand-dataset="isExpanded(item)"
-                                    :is-dataset="isDataset(item)"
-                                    :highlight="getHighlight(item)"
-                                    :selected="isSelected(item)"
-                                    :selectable="showSelection"
-                                    :filterable="filterable"
-                                    @tag-click="onTagClick"
-                                    @tag-change="onTagChange"
-                                    @toggleHighlights="toggleHighlights"
-                                    @update:expand-dataset="setExpanded(item, $event)"
-                                    @update:selected="setSelected(item, $event)"
-                                    @view-collection="$emit('view-collection', item, currentOffset)"
-                                    @delete="onDelete(item)"
-                                    @undelete="onUndelete(item)"
-                                    @unhide="onUnhide(item)" />
+                                    :active="active"
+                                    :data-index="index"
+                                    :size-dependencies="[isExpanded(item)]">
+                                    <ContentItem
+                                        v-if="!invisible[item.hid]"
+                                        :id="item.hid"
+                                        is-history-item
+                                        :item="item"
+                                        :name="item.name"
+                                        :writable="writable"
+                                        :expand-dataset="isExpanded(item)"
+                                        :is-dataset="isDataset(item)"
+                                        :highlight="getHighlight(item)"
+                                        :selected="isSelected(item)"
+                                        :selectable="showSelection"
+                                        :filterable="filterable"
+                                        @tag-click="onTagClick"
+                                        @tag-change="onTagChange"
+                                        @toggleHighlights="toggleHighlights"
+                                        @update:expand-dataset="setExpanded(item, $event)"
+                                        @update:selected="setSelected(item, $event)"
+                                        @view-collection="$emit('view-collection', item, currentOffset)"
+                                        @delete="onDelete(item)"
+                                        @undelete="onUndelete(item)"
+                                        @unhide="onUnhide(item)" />
+                                </DynamicScrollerItem>
                             </template>
                         </ListingLayout>
                     </div>
@@ -160,6 +167,7 @@ import OperationErrorDialog from "./HistoryOperations/OperationErrorDialog";
 import { rewatchHistory } from "store/historyStore/model/watchHistory";
 import { copyDataset } from "components/Dataset/services";
 import { storeToRefs } from "pinia";
+import { DynamicScrollerItem } from "vue-virtual-scroller";
 
 export default {
     components: {
@@ -179,6 +187,7 @@ export default {
         SelectedItems,
         SelectionChangeWarning,
         OperationErrorDialog,
+        DynamicScrollerItem,
     },
     props: {
         listOffset: { type: Number, default: 0 },

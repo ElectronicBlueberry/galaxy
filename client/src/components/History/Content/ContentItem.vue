@@ -1,7 +1,7 @@
 <template>
     <div
         :id="contentId"
-        :class="['content-item m-1 p-0 rounded btn-transparent-background', contentCls]"
+        :class="['content-item p-0 rounded btn-transparent-background', contentCls]"
         :data-hid="id"
         :data-state="state"
         tabindex="0"
@@ -204,6 +204,9 @@ export default {
                 visualize: `/visualizations?dataset_id=${id}`,
             };
         },
+    },
+    created() {
+        console.log("Content Item created");
     },
     methods: {
         onKeyDown(event) {

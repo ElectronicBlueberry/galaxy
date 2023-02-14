@@ -1,32 +1,28 @@
 <template>
     <div class="listing-layout">
-        <virtual-list
+        <DynamicScroller
             ref="listing"
             class="listing"
             role="list"
-            data-key="id"
-            :offset="offset"
-            :data-sources="items"
-            :data-component="{}"
-            @scroll="onScroll">
-            <template v-slot:item="{ item }">
-                <slot name="item" :item="item" :current-offset="getOffset()" />
+            key-field="id"
+            :items="items"
+            :min-item-size="40"
+            :buffer="600">
+            <template v-slot="{ item, index, active }">
+                <slot name="item" :item="item" :index="index" :active="active" :current-offset="getOffset()" />
             </template>
-            <template v-slot:footer>
-                <LoadingSpan v-if="loading" class="m-2" message="Loading" />
-            </template>
-        </virtual-list>
+        </DynamicScroller>
     </div>
 </template>
 
 <script>
-import VirtualList from "vue-virtual-scroll-list";
-import LoadingSpan from "components/LoadingSpan";
+import { DynamicScroller } from "vue-virtual-scroller";
+
+import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 export default {
     components: {
-        LoadingSpan,
-        VirtualList,
+        DynamicScroller,
     },
     props: {
         offset: { type: Number, default: 0 },
@@ -53,7 +49,7 @@ export default {
             }
         },
         getOffset() {
-            return this.$refs.listing?.getOffset() || 0;
+            return this.$refs.listing?.offsetTop ?? 0;
         },
     },
 };
@@ -70,6 +66,11 @@ export default {
         overflow-x: hidden;
         overflow-y: scroll;
         scroll-behavior: smooth;
+
+        &:deep(.dynamic-scroller-item) {
+            padding-top: 0.125rem;
+            padding-bottom: 0.125rem;
+        }
     }
 }
 </style>
