@@ -28,7 +28,12 @@ export function useFileDrop(
 
     const currentState: Ref<State> = ref("idle");
 
-    let resetTimer: ReturnType<typeof setTimeout> | null = null;
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    const resetTimer = () => {
+        if (idleTimer) {
+            clearTimeout(idleTimer);
+        }
+    };
 
     const stateMachine = {
         idle(event: MouseEvent): State {
@@ -65,17 +70,17 @@ export function useFileDrop(
                         const dropHandler = unref(onDrop);
                         dropHandler(event as DragEvent);
                     }
+                    resetTimer();
                     return "idle";
                 case "dragend":
+                    resetTimer();
                     return "idle";
                 case "mouseleave":
                     console.log(event);
             }
 
-            if (resetTimer) {
-                clearTimeout(resetTimer);
-            }
-            resetTimer = setTimeout(() => (currentState.value = "idle"), idleTime);
+            resetTimer();
+            idleTimer = setTimeout(() => (currentState.value = "idle"), idleTime);
 
             return "fileDragging";
         },
