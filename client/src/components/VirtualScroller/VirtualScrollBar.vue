@@ -1,0 +1,95 @@
+<script setup lang="ts">
+/**
+ * This component renders a scroll bar as if element had a given height,
+ * however it keeps the position of the slot contents static.
+ *
+ * The `virtualScroll` event and `scrollTo` function can be used to
+ * interact with the scroll. The scroll used is a relative value.
+ *
+ * This combined allows implementing a fully customized scrolling behavior
+ * for the content passed to the VirtualScrollBars slot.
+ */
+
+import { ref, watch, type Ref } from "vue";
+import { useAnimationFrameScroll } from "@/composables/sensors/animationFrameScroll";
+
+const props = defineProps<{
+    height: number;
+}>();
+
+const emit = defineEmits<{
+    (e: "virtualScroll", relativePosition: number): void;
+}>();
+
+const scrollBar: Ref<HTMLDivElement | null> = ref(null);
+const { scrollTop } = useAnimationFrameScroll(scrollBar);
+
+const virtualScrollBar: Ref<HTMLDivElement | null> = ref(null);
+
+watch(
+    () => scrollTop.value,
+    (scroll) => {
+        const parentHeight = virtualScrollBar.value?.offsetHeight ?? 0;
+        const totalScroll = props.height - parentHeight;
+
+        emit("virtualScroll", scroll / totalScroll);
+    }
+);
+
+function scrollTo(relativePosition: number, options?: { smooth?: boolean }): void {
+    const parentHeight = virtualScrollBar.value?.offsetHeight ?? 0;
+    const totalScroll = props.height - parentHeight;
+
+    if (options?.smooth) {
+        scrollBar.value?.scrollTo({ top: relativePosition * totalScroll, behavior: "smooth" });
+    } else if (scrollBar.value) {
+        scrollBar.value.scrollTop = relativePosition * totalScroll;
+    }
+}
+
+defineExpose({ scrollTo });
+</script>
+
+<template>
+    <div ref="virtualScrollBar" class="virtual-scroll-bar">
+        <div ref="scrollBar" class="scroll-bar" :style="`--height:${height}px`">
+            <div class="expander"></div>
+            <div class="scroll-bar-content">
+                <slot></slot>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style scoped lang="scss">
+.virtual-scroll-bar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    .scroll-bar {
+        position: absolute;
+        overflow-y: scroll;
+        width: 100%;
+        height: 100%;
+
+        .expander {
+            position: absolute;
+            top: 0;
+            left: 0;
+
+            height: var(--height);
+            width: 100%;
+        }
+    }
+    .scroll-bar-content {
+        position: sticky;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+
+        overflow: hidden;
+    }
+}
+</style>
