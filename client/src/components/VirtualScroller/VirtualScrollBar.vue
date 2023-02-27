@@ -50,8 +50,8 @@ defineExpose({ scrollTo });
 
 <template>
     <div ref="virtualScrollBar" class="virtual-scroll-bar" :style="`--height:${height}px`">
-        <div class="expander"></div>
-        <div class="scroll-bar-content">
+        <div class="virtual-scroll-bar-expander"></div>
+        <div class="virtual-scroll-bar-content">
             <slot></slot>
         </div>
     </div>
@@ -64,7 +64,7 @@ defineExpose({ scrollTo });
     width: 100%;
     height: 100%;
 
-    .expander {
+    .virtual-scroll-bar-expander {
         position: absolute;
         top: 0;
         left: 0;
@@ -73,7 +73,7 @@ defineExpose({ scrollTo });
         width: 100%;
     }
 
-    .scroll-bar-content {
+    .virtual-scroll-bar-content {
         position: sticky;
         top: 0;
         left: 0;
