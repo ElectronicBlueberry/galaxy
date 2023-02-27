@@ -21,29 +21,27 @@ const emit = defineEmits<{
     (e: "virtualScroll", relativePosition: number): void;
 }>();
 
-const scrollBar: Ref<HTMLDivElement | null> = ref(null);
-const { scrollTop } = useAnimationFrameScroll(scrollBar);
-
 const virtualScrollBar: Ref<HTMLDivElement | null> = ref(null);
+const { scrollTop } = useAnimationFrameScroll(virtualScrollBar);
 
 watch(
     () => scrollTop.value,
     (scroll) => {
-        const parentHeight = virtualScrollBar.value?.offsetHeight ?? 0;
-        const totalScroll = props.height - parentHeight;
+        const containerHeight = virtualScrollBar.value?.offsetHeight ?? 0;
+        const totalScroll = props.height - containerHeight;
 
         emit("virtualScroll", scroll / totalScroll);
     }
 );
 
 function scrollTo(relativePosition: number, options?: { smooth?: boolean }): void {
-    const parentHeight = virtualScrollBar.value?.offsetHeight ?? 0;
-    const totalScroll = props.height - parentHeight;
+    const containerHeight = virtualScrollBar.value?.offsetHeight ?? 0;
+    const totalScroll = props.height - containerHeight;
 
     if (options?.smooth) {
-        scrollBar.value?.scrollTo({ top: relativePosition * totalScroll, behavior: "smooth" });
-    } else if (scrollBar.value) {
-        scrollBar.value.scrollTop = relativePosition * totalScroll;
+        virtualScrollBar.value?.scrollTo({ top: relativePosition * totalScroll, behavior: "smooth" });
+    } else if (virtualScrollBar.value) {
+        virtualScrollBar.value.scrollTop = relativePosition * totalScroll;
     }
 }
 
@@ -51,37 +49,30 @@ defineExpose({ scrollTo });
 </script>
 
 <template>
-    <div ref="virtualScrollBar" class="virtual-scroll-bar">
-        <div ref="scrollBar" class="scroll-bar" :style="`--height:${height}px`">
-            <div class="expander"></div>
-            <div class="scroll-bar-content">
-                <slot></slot>
-            </div>
+    <div ref="virtualScrollBar" class="virtual-scroll-bar" :style="`--height:${height}px`">
+        <div class="expander"></div>
+        <div class="scroll-bar-content">
+            <slot></slot>
         </div>
     </div>
 </template>
 
 <style scoped lang="scss">
 .virtual-scroll-bar {
-    position: absolute;
+    position: relative;
+    overflow-y: scroll;
     width: 100%;
     height: 100%;
 
-    .scroll-bar {
+    .expander {
         position: absolute;
-        overflow-y: scroll;
+        top: 0;
+        left: 0;
+
+        height: var(--height);
         width: 100%;
-        height: 100%;
-
-        .expander {
-            position: absolute;
-            top: 0;
-            left: 0;
-
-            height: var(--height);
-            width: 100%;
-        }
     }
+
     .scroll-bar-content {
         position: sticky;
         top: 0;
