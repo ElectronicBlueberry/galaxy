@@ -97,7 +97,7 @@
                                 No data found for selected filter.
                             </b-alert>
                         </div>
-                        <ListingLayout
+                        <!--ListingLayout
                             v-else
                             :offset="listOffset"
                             :items="itemsLoaded"
@@ -127,7 +127,37 @@
                                     @undelete="onUndelete(item)"
                                     @unhide="onUnhide(item)" />
                             </template>
-                        </ListingLayout>
+                        </ListingLayout-->
+                        <VirtualScroller
+                            v-else
+                            class="position-absolute w-100 h-100"
+                            :items="itemsLoaded"
+                            :estimated-item-height="40">
+                            <template v-slot:item="{ item, currentOffset }">
+                                <ContentItem
+                                    v-if="!invisible[item.hid]"
+                                    :id="item.hid"
+                                    is-history-item
+                                    :item="item"
+                                    :name="item.name"
+                                    :writable="writable"
+                                    :expand-dataset="isExpanded(item)"
+                                    :is-dataset="isDataset(item)"
+                                    :highlight="getHighlight(item)"
+                                    :selected="isSelected(item)"
+                                    :selectable="showSelection"
+                                    :filterable="filterable"
+                                    @tag-click="onTagClick"
+                                    @tag-change="onTagChange"
+                                    @toggleHighlights="toggleHighlights"
+                                    @update:expand-dataset="setExpanded(item, $event)"
+                                    @update:selected="setSelected(item, $event)"
+                                    @view-collection="$emit('view-collection', item, currentOffset)"
+                                    @delete="onDelete(item)"
+                                    @undelete="onUndelete(item)"
+                                    @unhide="onUnhide(item)" />
+                            </template>
+                        </VirtualScroller>
                     </div>
                 </section>
             </section>
@@ -146,7 +176,6 @@ import ContentItem from "components/History/Content/ContentItem";
 import { deleteContent, updateContentFields } from "components/History/model/queries";
 import ExpandedItems from "components/History/Content/ExpandedItems";
 import SelectedItems from "components/History/Content/SelectedItems";
-import ListingLayout from "components/History/Layout/ListingLayout";
 import HistoryCounter from "./HistoryCounter";
 import HistoryOperations from "./HistoryOperations/Index";
 import HistoryDetails from "./HistoryDetails";
@@ -160,6 +189,7 @@ import SelectionChangeWarning from "./HistoryOperations/SelectionChangeWarning";
 import OperationErrorDialog from "./HistoryOperations/OperationErrorDialog";
 import { rewatchHistory } from "store/historyStore/model/watchHistory";
 import { copyDataset } from "components/Dataset/services";
+import VirtualScroller from "@/components/VirtualScroller/VirtualScroller.vue";
 
 export default {
     components: {
@@ -175,10 +205,10 @@ export default {
         HistorySelectionOperations,
         HistorySelectionStatus,
         LoadingSpan,
-        ListingLayout,
         SelectedItems,
         SelectionChangeWarning,
         OperationErrorDialog,
+        VirtualScroller,
     },
     props: {
         listOffset: { type: Number, default: 0 },
@@ -201,6 +231,7 @@ export default {
             operationRunning: null,
             operationError: null,
             querySelectionBreak: false,
+            scroll: 0,
         };
     },
     computed: {
