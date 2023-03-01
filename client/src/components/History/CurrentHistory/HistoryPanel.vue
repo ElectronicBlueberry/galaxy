@@ -132,7 +132,7 @@
                             v-else
                             class="position-absolute w-100 h-100"
                             :items="itemsLoaded"
-                            :estimated-item-height="40">
+                            :estimated-item-height="40.4">
                             <template v-slot:item="{ item, currentOffset }">
                                 <ContentItem
                                     v-if="!invisible[item.hid]"

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import VirtualScrollBar from "./VirtualScrollBar.vue";
 import { ref, type Ref, watch, computed, type ComputedRef } from "vue";
-import { useAnimationFrame } from "@/composables/sensors/animationFrame";
 import { useAnimationFrameResizeObserver } from "@/composables/sensors/animationFrameResizeObserver";
 
 const props = defineProps<{
@@ -24,9 +23,10 @@ const virtualScrollBarElement: ComputedRef<HTMLElement | null> = computed(() => 
 });
 const itemOffset = ref(0);
 const itemCount = ref(0);
+
 useAnimationFrameResizeObserver(virtualScrollBarElement, ({ clientSize }) => {
     const height = clientSize.height;
-    itemCount.value = Math.ceil(height / props.estimatedItemHeight);
+    itemCount.value = Math.ceil(height / props.estimatedItemHeight) + 1;
 });
 
 const scrollWindow = computed(() => {
@@ -44,26 +44,18 @@ watch(
 );
 
 const itemsInWindow = computed(() => props.items.slice(scrollWindow.value.from, scrollWindow.value.to));
-
 const contentWindow: Ref<Element | null> = ref(null);
-const virtualScrollBarHeight = computed(() =>
-    Math.max(itemsInWindow.value.length * props.estimatedItemHeight, contentWindow.value?.scrollHeight ?? 0)
-);
-
+const virtualScrollBarHeight = computed(() => itemsInWindow.value.length * props.estimatedItemHeight * 2);
 const contentWindowOffset = ref(0);
 
-//let relativeScroll = 0;
 function virtualScroll(relativePosition: number) {
-    //    relativeScroll = relativePosition;
+    const indexOffset = (relativePosition * virtualScrollBarHeight.value) / props.estimatedItemHeight;
+    contentWindowOffset.value = -indexOffset * props.estimatedItemHeight;
 }
-
-useAnimationFrame(() => {
-    //const indexOffset = (relativeScroll * virtualScrollBarHeight.value) / props.estimatedItemHeight;
-});
 </script>
 
 <template>
-    <VirtualScrollBar ref="virtualScrollBar" :height="virtualScrollBarHeight" @virtual-scroll="virtualScroll">
+    <VirtualScrollBar ref="virtualScrollBar" :height="virtualScrollBarHeight" @virtualScroll="virtualScroll">
         <div
             ref="contentWindow"
             class="virtual-scroller-content-window"
