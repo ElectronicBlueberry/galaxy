@@ -5,10 +5,10 @@ import { getGalaxyInstance } from "app";
 import { patchRouterPush } from "./router-push";
 
 // these modules are mounted below the masthead.
-import Analysis from "entry/analysis/modules/Analysis";
-import Home from "entry/analysis/modules/Home";
+import Analysis from "@/entry/analysis/modules/AnalysisPage.vue";
+import Home from "@/entry/analysis/modules/HomePage.vue";
 import CenterFrame from "entry/analysis/modules/CenterFrame";
-import Login from "entry/analysis/modules/Login";
+import Login from "@/entry/analysis/modules/UserLogin.vue";
 import WorkflowEditorModule from "entry/analysis/modules/WorkflowEditor";
 
 // routes

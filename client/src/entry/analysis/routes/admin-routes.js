@@ -1,7 +1,7 @@
 import { getGalaxyInstance } from "app";
 
-import Admin from "entry/analysis/modules/Admin";
-import Home from "components/admin/Home";
+import Admin from "@/entry/analysis/modules/AdminPage.vue";
+import Home from "@/components/admin/AdminHome.vue";
 import ActiveInvocations from "components/admin/ActiveInvocations";
 import DataManager from "components/admin/DataManager/DataManager";
 import DataManagerJobs from "components/admin/DataManager/DataManagerJobs";

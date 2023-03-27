@@ -1,6 +1,6 @@
 import StorageManager from "@/components/User/DiskUsage/Management/StorageManager.vue";
 import StorageDashboard from "@/components/User/DiskUsage/StorageDashboard.vue";
-import Base from "@/entry/analysis/modules/Base.vue";
+import Base from "@/entry/analysis/modules/AppBase.vue";
 
 export default [
     {

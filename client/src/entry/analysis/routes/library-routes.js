@@ -1,4 +1,4 @@
-import Base from "entry/analysis/modules/Base";
+import Base from "@/entry/analysis/modules/AppBase.vue";
 import LibrariesList from "components/Libraries/LibrariesList";
 import LibraryFolder from "components/Libraries/LibraryFolder/LibraryFolder";
 import LibraryFolderDatasetPermissions from "components/Libraries/LibraryFolder/LibraryFolderPermissions/LibraryFolderDatasetPermissions";
