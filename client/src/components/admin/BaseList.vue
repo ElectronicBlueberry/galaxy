@@ -42,24 +42,31 @@ export default {
     props: {
         icon: {
             type: String,
+            default: null,
         },
         tooltip: {
             type: String,
+            default: null,
         },
         plural: {
             type: String,
+            default: null,
         },
         success: {
             type: String,
+            default: null,
         },
         fields: {
             type: Array,
+            default: null,
         },
         getter: {
             type: Function,
+            default: null,
         },
         setter: {
             type: Function,
+            default: null,
         },
     },
     data() {

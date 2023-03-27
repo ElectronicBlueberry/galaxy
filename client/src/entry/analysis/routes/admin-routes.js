@@ -19,7 +19,7 @@ import RegisterForm from "components/Login/RegisterForm";
 import ResetMetadata from "components/admin/ResetMetadata";
 import SanitizeAllow from "components/admin/SanitizeAllow";
 import Toolshed from "components/Toolshed/Index";
-import ToolboxDependencies from "components/admin/Dependencies/Landing";
+import ToolboxDependencies from "@/components/admin/Dependencies/LandingPage.vue";
 
 export default [
     {

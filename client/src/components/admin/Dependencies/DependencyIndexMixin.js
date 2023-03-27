@@ -1,7 +1,7 @@
 import { getAppRoot } from "onload/loadConfig";
 import DependencyIndexWrapper from "./DependencyIndexWrapper";
 import DependencyResolver from "./DependencyResolver";
-import Requirements from "./Requirements";
+import Requirements from "./RequirementsView.vue";
 import StatusDisplay from "./StatusDisplay";
 import Statuses from "./StatusesView.vue";
 import ContainerDescription from "./ContainerDescription";

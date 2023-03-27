@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import Requirements from "./Requirements";
+import Requirements from "./RequirementsView.vue";
 import StatusDisplay from "./StatusDisplay";
 import ContainerDescription from "./ContainerDescription";
 import ContainerResolver from "./ContainerResolver";

@@ -30,6 +30,7 @@ export default {
     props: {
         dependencyResolver: {
             type: Object,
+            default: null,
         },
         compact: {
             type: Boolean,

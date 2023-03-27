@@ -5,18 +5,23 @@ import App from "./App.vue";
 import { getRouter } from "./router";
 import { addInitialization, standardInit } from "@/onload";
 import store from "@/store";
+import type VueRouter from "vue-router";
 
 Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
-addInitialization((Galaxy: any) => {
+interface Galaxy {
+    router: VueRouter;
+}
+
+addInitialization((galaxy: Galaxy) => {
     console.log("App setup");
-    const router = getRouter(Galaxy);
+    const router = getRouter(galaxy);
     // When initializing the primary app we bind the routing back to Galaxy for
     // external use (e.g. gtn webhook) -- longer term we discussed plans to
     // parameterize webhooks and initialize them explicitly with state.
-    Galaxy.router = router;
+    galaxy.router = router;
     new Vue({
         el: "#app",
         setup() {

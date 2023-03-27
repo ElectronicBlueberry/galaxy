@@ -8,9 +8,10 @@
                         class="icon-btn"
                         href="javascript:void(0)"
                         :title="`Reload ${dataManagerTableName} tool data table`"
-                        @click="handleReloadButtonClick"
-                        ><span class="fa fa-sync"></span
-                    ></a>
+                        @click="handleReloadButtonClick">
+                        <span class="fa fa-sync"></span>
+                        <span class="sr-only">Reload {{ dataManagerTableName }} tool data table</span>
+                    </a>
                 </th>
             </tr>
             <tr>

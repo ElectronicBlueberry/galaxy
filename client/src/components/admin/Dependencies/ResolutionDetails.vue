@@ -68,8 +68,8 @@
 </template>
 <script>
 import DependencyResolver from "./DependencyResolver";
-import Requirements from "./Requirements";
-import Requirement from "./Requirement";
+import Requirements from "./RequirementsView.vue";
+import Requirement from "./RequirementDisplay.vue";
 import StatusDisplay from "./StatusDisplay";
 import ContainerResolutionDetails from "./ContainerResolutionDetails";
 import Tools from "./ToolsView.vue";

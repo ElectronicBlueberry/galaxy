@@ -9,18 +9,23 @@
                     v-b-tooltip
                     class="fa fa-print ml-1 invocation-pdf-link"
                     :href="invocationPdfLink"
-                    title="Download PDF" />
+                    title="Download PDF">
+                    <span class="sr-only">Download PDF</span>
+                </a>
             </span>
         </div>
         <div v-else-if="!invocationSchedulingTerminal">
             <b-alert variant="info" show>
                 <LoadingSpan :message="`Waiting to complete invocation ${indexStr}`" />
             </b-alert>
-            <span
+            <b-button
                 v-b-tooltip.hover
-                class="fa fa-times cancel-workflow-scheduling"
+                class="ui-link cancel-workflow-scheduling"
                 title="Cancel scheduling of workflow invocation"
-                @click="onCancel"></span>
+                @click="onCancel">
+                <FontAwesomeIcon icon="fa-times"></FontAwesomeIcon>
+                <span class="sr-only">Cancel scheduling of workflow invocation</span>
+            </b-button>
         </div>
         <progress-bar v-if="!stepCount" note="Loading step state summary..." :loading="true" class="steps-progress" />
         <template v-if="invocation.messages?.length">
@@ -66,6 +71,11 @@ import mixin from "components/JobStates/mixin";
 import ProgressBar from "components/ProgressBar";
 import LoadingSpan from "components/LoadingSpan";
 import InvocationMessage from "@/components/WorkflowInvocationState/InvocationMessage.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
+
+library.add(faTimes);
 
 import { mapGetters } from "vuex";
 
@@ -76,6 +86,7 @@ export default {
         InvocationMessage,
         ProgressBar,
         LoadingSpan,
+        FontAwesomeIcon,
     },
     mixins: [mixin],
     props: {

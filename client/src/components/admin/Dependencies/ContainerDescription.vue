@@ -1,7 +1,10 @@
 <template>
     <span class="container-description">
         <span v-if="containerDescription" :title="title">
-            <a v-if="externalUrl" class="icon-btn" :href="externalUrl"><span class="fa fa-link"></span></a>
+            <a v-if="externalUrl" class="icon-btn" :href="externalUrl">
+                <span class="fa fa-link"></span>
+                <span class="sr-only">{{ title }}</span>
+            </a>
             {{ containerDescription.identifier }}
             <span v-if="!compact">
                 <i>{{ description }}</i>
@@ -21,6 +24,7 @@ export default {
     props: {
         containerDescription: {
             type: Object,
+            default: null,
         },
         compact: {
             type: Boolean,

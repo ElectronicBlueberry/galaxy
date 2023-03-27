@@ -35,6 +35,7 @@ export default {
     props: {
         containerResolver: {
             type: Object,
+            default: null,
         },
         compact: {
             type: Boolean,
