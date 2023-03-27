@@ -105,9 +105,18 @@ export default {
         WorkflowInvocationState: () => import("components/WorkflowInvocationState/WorkflowInvocationState"),
     },
     props: {
-        invocation: Object,
-        workflowStep: Object,
-        workflow: Object,
+        invocation: {
+            type: Object,
+            required: true,
+        },
+        workflowStep: {
+            type: Object,
+            required: true,
+        },
+        workflow: {
+            type: Object,
+            required: true,
+        },
     },
     data() {
         return {

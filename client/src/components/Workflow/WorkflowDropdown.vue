@@ -91,7 +91,12 @@ export default {
     components: {
         FontAwesomeIcon,
     },
-    props: ["workflow"],
+    props: {
+        workflow: {
+            type: Object,
+            required: true,
+        },
+    },
     computed: {
         urlEdit() {
             return `/workflows/edit?id=${this.workflow.id}`;

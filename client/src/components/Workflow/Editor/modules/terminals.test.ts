@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { setActivePinia, createPinia } from "pinia";
 
 import { useWorkflowStepStore, type TerminalSource } from "@/stores/workflowStepStore";
