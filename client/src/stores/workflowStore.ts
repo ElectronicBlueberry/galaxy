@@ -4,7 +4,7 @@ import type { Steps } from "@/stores/workflowStepStore";
 import { getAppRoot } from "@/onload/loadConfig";
 
 interface Workflow {
-    [index: string]: any;
+    [index: string]: unknown;
     steps: Steps;
 }
 

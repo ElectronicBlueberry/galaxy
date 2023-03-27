@@ -94,7 +94,7 @@ interface WorkflowOutput {
 
 export interface NewStep {
     annotation?: string;
-    config_form?: { [index: string]: any };
+    config_form?: { [index: string]: unknown };
     content_id?: string | null;
     id?: number;
     errors?: string[] | null;
@@ -156,7 +156,7 @@ export const useWorkflowStepStore = defineStore("workflowStepStore", {
                 return state.steps[stepId.toString()];
             };
         },
-        getStepExtraInputs(state: State) {
+        getStepExtraInputs() {
             return (stepId: number) => this.stepExtraInputs[stepId] || [];
         },
         getStepIndex(state: State) {
@@ -206,8 +206,9 @@ export const useWorkflowStepStore = defineStore("workflowStepStore", {
             Vue.set(this.stepInputMapOver, stepId, {});
         },
         changeStepInputMapOver(stepId: number, inputName: string, mapOver: CollectionTypeDescriptor) {
-            if (this.stepInputMapOver[stepId]) {
-                Vue.set(this.stepInputMapOver[stepId]!, inputName, mapOver);
+            const inputMapOver = this.stepInputMapOver[stepId];
+            if (inputMapOver) {
+                Vue.set(inputMapOver, inputName, mapOver);
             } else {
                 Vue.set(this.stepInputMapOver, stepId, { [inputName]: mapOver });
             }

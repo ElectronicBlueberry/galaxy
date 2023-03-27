@@ -9,6 +9,9 @@
  * Comparison aliases are allowed converting e.g. '>' to '-gt' and '<' to '-lt'.
  */
 
+import type { Tuple } from "types/utilityTypes";
+import { assertDefined } from "./assertions";
+
 type Converter<T> = (value: T) => T;
 type Handler<T> = (v: T, q: T) => boolean;
 
@@ -238,19 +241,19 @@ export default class Filtering<T> {
      * @param filterText Raw filter text string
      * @returns Filters as dict of field->value pairs
      * */
-    getFilters(filterText: string): [string, T][] {
+    getFilters(filterText: string): [string, string | boolean][] {
         const pairSplitRE = /[^\s'"]+(?:['"][^'"]*['"][^\s'"]*)*|(?:['"][^'"]*['"][^\s'"]*)+/g;
         const matches = filterText.match(pairSplitRE);
-        let result: Record<string, any> = {};
+        let result: Record<string, string | boolean> = {};
         let hasMatches = false;
         if (matches) {
             matches.forEach((pair) => {
                 const elgRE = /(\S+)([:><])(.+)/g;
-                const elgMatch = elgRE.exec(pair);
+                const elgMatch = elgRE.exec(pair) as Tuple<4, string> | null;
                 if (elgMatch) {
-                    let field = elgMatch[1]!;
-                    const elg = elgMatch[2]!;
-                    const value = elgMatch[3]!;
+                    let field = elgMatch[1];
+                    const elg = elgMatch[2];
+                    const value = elgMatch[3];
                     // replace alias for less and greater symbol
                     for (const [alias, substitute] of this.validAliases) {
                         if (elg === alias) {
@@ -322,11 +325,12 @@ export default class Filtering<T> {
      * @returns Dictionary with query key and values
      */
     getQueryDict(filterText: string) {
-        const queryDict: Record<string, T> = {};
+        const queryDict: Record<string, string | boolean> = {};
         const filters = this.getFilters(filterText);
         for (const [key, value] of filters) {
-            const query = this.validFilters[key]!.query;
-            const converter = this.validFilters[key]!.converter;
+            const query = this.validFilters[key]?.query;
+            assertDefined(query);
+            const converter = this.validFilters[key]?.converter as Converter<typeof value> | undefined;
             queryDict[query] = converter ? converter(value) : value;
         }
         return queryDict;
@@ -382,8 +386,10 @@ export default class Filtering<T> {
             if (!(key in this.validFilters)) {
                 console.error(`Invalid filter ${key}`);
             } else {
-                const filterAttribute = this.validFilters[key]!.attribute;
-                const filterHandler = this.validFilters[key]!.handler;
+                const validFilter = this.validFilters[key];
+                assertDefined(validFilter);
+                const filterAttribute = validFilter.attribute;
+                const filterHandler = validFilter.handler;
                 const itemValue = item[filterAttribute];
                 if (itemValue === undefined || !filterHandler(itemValue, filterValue)) {
                     return false;

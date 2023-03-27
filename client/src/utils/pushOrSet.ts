@@ -5,8 +5,10 @@
  * @param value Value to push
  */
 export function pushOrSet<T, K extends string | number | symbol>(object: { [key in K]: Array<T> }, key: K, value: T) {
-    if (key in object) {
-        object[key]!.push(value);
+    const array = object[key];
+
+    if (array) {
+        array.push(value);
     } else {
         object[key] = [value];
     }
