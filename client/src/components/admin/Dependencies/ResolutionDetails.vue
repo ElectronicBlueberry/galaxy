@@ -72,7 +72,7 @@ import Requirements from "./Requirements";
 import Requirement from "./Requirement";
 import StatusDisplay from "./StatusDisplay";
 import ContainerResolutionDetails from "./ContainerResolutionDetails";
-import Tools from "./Tools";
+import Tools from "./ToolsView.vue";
 import ToolDisplay from "./ToolDisplay";
 
 export default {
@@ -105,7 +105,7 @@ export default {
         resolutionOkay: function() {
             let anyUnresolved = this.resolution.status.length != 0;  // odd logic here, but we call no requirements unresolved in the GUI :(
             for( const status of this.resolution.status ) {
-                anyUnresolved = anyUnresolved || status.dependency_type == null;                    
+                anyUnresolved = anyUnresolved || status.dependency_type == null;
             }
             return !anyUnresolved;
         },

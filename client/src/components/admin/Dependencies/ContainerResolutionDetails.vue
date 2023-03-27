@@ -48,7 +48,7 @@ import Requirements from "./Requirements";
 import StatusDisplay from "./StatusDisplay";
 import ContainerDescription from "./ContainerDescription";
 import ContainerResolver from "./ContainerResolver";
-import Tools from "./Tools";
+import Tools from "./ToolsView.vue";
 import ToolDisplay from "./ToolDisplay";
 
 export default {

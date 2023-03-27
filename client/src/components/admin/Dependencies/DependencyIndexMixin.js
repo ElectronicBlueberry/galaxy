@@ -3,10 +3,10 @@ import DependencyIndexWrapper from "./DependencyIndexWrapper";
 import DependencyResolver from "./DependencyResolver";
 import Requirements from "./Requirements";
 import StatusDisplay from "./StatusDisplay";
-import Statuses from "./Statuses";
+import Statuses from "./StatusesView.vue";
 import ContainerDescription from "./ContainerDescription";
 import ContainerResolver from "./ContainerResolver";
-import Tools from "./Tools";
+import Tools from "./ToolsView.vue";
 import ToolDisplay from "./ToolDisplay";
 
 export default {

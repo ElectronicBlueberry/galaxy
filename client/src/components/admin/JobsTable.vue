@@ -51,9 +51,11 @@ export default {
             required: true,
         },
         fields: {
+            type: Object,
             required: true,
         },
         items: {
+            type: Array,
             required: true,
         },
         filter: {
@@ -72,7 +74,10 @@ export default {
             type: String,
             default: "No jobs to display.",
         },
-        value: {},
+        value: {
+            type: Object,
+            required: true,
+        },
     },
     data() {
         return {

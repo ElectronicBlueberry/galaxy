@@ -14,7 +14,7 @@ import DisplayApplications from "components/admin/DisplayApplications";
 import ErrorStack from "components/admin/ErrorStack";
 import FormGeneric from "components/Form/FormGeneric";
 import Grid from "components/Grid/Grid";
-import Jobs from "components/admin/Jobs";
+import Jobs from "@/components/admin/JobsView.vue";
 import RegisterForm from "components/Login/RegisterForm";
 import ResetMetadata from "components/admin/ResetMetadata";
 import SanitizeAllow from "components/admin/SanitizeAllow";
