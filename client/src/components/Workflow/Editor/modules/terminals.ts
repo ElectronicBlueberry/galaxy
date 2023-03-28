@@ -132,7 +132,7 @@ class Terminal extends EventEmitter {
     isMappedOver(): boolean {
         return Boolean(this.mapOver.isCollection);
     }
-    resetMapping(connection?: Connection) {
+    resetMapping(_connection?: Connection) {
         this.stepStore.changeStepMapOver(this.stepId, NULL_COLLECTION_TYPE_DESCRIPTION);
         this.stepStore.resetStepInputMapOver(this.stepId);
     }
@@ -181,8 +181,9 @@ class BaseInputTerminal extends Terminal {
         this.datatypes = attr.input.datatypes;
         this.multiple = attr.input.multiple;
         this.optional = attr.input.optional;
-        if (this.stepStore.stepInputMapOver[this.stepId] && this.stepStore.stepInputMapOver[this.stepId]?.[this.name]) {
-            this.localMapOver = this.stepStore.stepInputMapOver[this.stepId]![this.name]!;
+        const mappedOver = this.stepStore.stepInputMapOver[this.stepId];
+        if (mappedOver?.[this.name]) {
+            this.localMapOver = mappedOver[this.name]!;
         } else {
             this.localMapOver = NULL_COLLECTION_TYPE_DESCRIPTION;
         }
@@ -216,7 +217,7 @@ class BaseInputTerminal extends Terminal {
             return this.attachable(outputTerminal);
         }
     }
-    attachable(terminal: BaseOutputTerminal): ConnectionAcceptable {
+    attachable(_terminal: BaseOutputTerminal): ConnectionAcceptable {
         // TODO: provide through Mixin
         throw Error("Subclass needs to implement this");
     }
@@ -362,12 +363,10 @@ class BaseInputTerminal extends Terminal {
             if (outputStep.when) {
                 terminalSource = { ...terminalSource, optional: true };
             }
-            if (
-                "extensions" in terminalSource &&
-                outputStep.post_job_actions &&
-                postJobActionKey in outputStep.post_job_actions
-            ) {
-                const extensionType = outputStep.post_job_actions![postJobActionKey]!.action_arguments.newtype;
+
+            const postJobAction = outputStep.post_job_actions?.[postJobActionKey];
+            if ("extensions" in terminalSource && postJobAction) {
+                const extensionType = postJobAction.action_arguments.newtype;
 
                 (terminalSource as DataOutput | CollectionOutput) = {
                     ...terminalSource,
@@ -412,7 +411,7 @@ export class InvalidInputTerminal extends BaseInputTerminal {
         this.localMapOver = NULL_COLLECTION_TYPE_DESCRIPTION;
     }
 
-    attachable(terminal: BaseOutputTerminal) {
+    attachable(_terminal: BaseOutputTerminal) {
         return new ConnectionAcceptable(false, "Cannot attach to invalid input. Disconnect this input.");
     }
 }
@@ -545,9 +544,7 @@ export class InputCollectionTerminal extends BaseInputTerminal {
         const collectionTypes = this.collectionTypes;
         const canMatch = collectionTypes.some((collectionType) => collectionType.canMatch(otherCollectionType));
         if (!canMatch) {
-            for (const collectionTypeIndex in collectionTypes) {
-                const collectionType = collectionTypes[collectionTypeIndex]!;
-
+            collectionTypes.forEach((collectionType) => {
                 if (otherCollectionType.canMapOver(collectionType)) {
                     const effectiveMapOver = otherCollectionType.effectiveMapOver(collectionType);
 
@@ -555,7 +552,7 @@ export class InputCollectionTerminal extends BaseInputTerminal {
                         return effectiveMapOver;
                     }
                 }
-            }
+            });
         }
         return NULL_COLLECTION_TYPE_DESCRIPTION;
     }
@@ -657,7 +654,7 @@ class BaseOutputTerminal extends Terminal {
     }
 
     getInvalidConnectedTerminals() {
-        return this.getConnectedTerminals().filter((terminal: any) => {
+        return this.getConnectedTerminals().filter((terminal) => {
             const canAccept = terminal.attachable(this);
             const connectionId = `${terminal.stepId}-${terminal.name}-${this.stepId}-${this.name}`;
             if (!canAccept.canAccept) {
@@ -793,9 +790,7 @@ export function producesAcceptableDatatype(
     inputDatatypes: string[],
     otherDatatypes: string[]
 ) {
-    for (const t in inputDatatypes) {
-        const thisDatatype = inputDatatypes[t]!;
-
+    inputDatatypes.forEach((thisDatatype) => {
         if (thisDatatype === "input") {
             return new ConnectionAcceptable(true, null);
         }
@@ -811,7 +806,7 @@ export function producesAcceptableDatatype(
         if (validMatch) {
             return new ConnectionAcceptable(true, null);
         }
-    }
+    });
     const datatypesSet = new Set(datatypesMapper.datatypes);
     const invalidDatatypes = otherDatatypes.filter((datatype) => !datatypesSet.has(datatype));
     if (invalidDatatypes.length) {
