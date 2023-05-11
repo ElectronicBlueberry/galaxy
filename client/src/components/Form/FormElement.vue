@@ -313,7 +313,7 @@ const elementType = computed(() => {
                 :data-label="props.title"
                 :type="props.type ?? (attrs.options ? 'select' : 'text')"
                 :attributes="attrs" />
-            <FormInput v-else :id="props.id" v-model="currentValue" :area="attrs['area']" />
+            <FormInput v-else :id="props.id" v-model="currentValue" :text-area="attrs.area" />
         </div>
 
         <div v-if="showPreview" class="ui-form-preview pt-1 pl-2 mt-1">{{ previewText }}</div>
