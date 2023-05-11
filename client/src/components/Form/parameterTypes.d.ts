@@ -1,6 +1,9 @@
 // TODO: stricter types
 export type FormParameterValue = any;
 export type FormParameterAttributes = {
+    is_workflow: boolean;
+    optional: boolean;
+    display: Array<"radio", "checkboxes">;
     [attribute: string]: any;
 };
 

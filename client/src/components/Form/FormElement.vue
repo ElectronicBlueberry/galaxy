@@ -71,7 +71,9 @@ library.add(faExclamation, faTimes, faArrowsAltH, faCaretSquareDown, faCaretSqua
  It is present for compatibility with the legacy "FormParameter" component,
  but should be removed as soon as that component is removed.
  */
-const attrs: ComputedRef<FormParameterAttributes> = computed(() => props.attributes || useAttrs());
+const attrs: ComputedRef<FormParameterAttributes> = computed(
+    () => props.attributes || (useAttrs() as FormParameterAttributes)
+);
 const collapsibleValue: ComputedRef<FormParameterValue> = computed(() => attrs.value["collapsible_value"]);
 const defaultValue: ComputedRef<FormParameterValue> = computed(() => attrs.value["default_value"]);
 const connectedValue: FormParameterValue = { __class__: "ConnectedValue" };
@@ -144,12 +146,6 @@ const currentValue = computed({
     },
 });
 
-const isHiddenType = computed(
-    () =>
-        ["hidden", "hidden_data", "baseurl"].includes(props.type ?? "") ||
-        (props.attributes && props.attributes.titleonly)
-);
-
 const collapseText = computed(() => (collapsed.value ? props.collapsedEnableText : props.collapsedDisableText));
 const connectText = computed(() => (connected.value ? props.connectedEnableText : props.connectedDisableText));
 
@@ -168,6 +164,44 @@ const isEmpty = computed(() => {
 const isRequired = computed(() => attrs.value["optional"] === false);
 const isRequiredType = computed(() => props.type !== "boolean");
 const isOptional = computed(() => !isRequired.value && attrs.value["optional"] !== undefined);
+
+const elementType = computed(() => {
+    if (props.type === "boolean") {
+        return "boolean";
+    }
+
+    if (
+        ["hidden", "hidden_data", "baseurl"].includes(props.type ?? "") ||
+        (props.attributes && props.attributes.titleonly)
+    ) {
+        return "hidden";
+    }
+
+    if (props.type === "float" || props.type === "integer") {
+        return "number";
+    }
+
+    if (props.type === "select" && attrs.value.is_workflow && attrs.value.optional) {
+        return "optional_text";
+    }
+
+    if (
+        ["text", "password"].includes(props.type as string) ||
+        (attrs.value.is_workflow &&
+            ["select", "genomebuild", "data_column", "group_tag"].includes(props.type as string))
+    ) {
+        return "text";
+    }
+
+    if (
+        (props.type === undefined && attrs.value.options) ||
+        ["data_column", "genomebuild", "group_tag", "select"].includes(props.type as string)
+    ) {
+        return "selection";
+    }
+
+    return props.type;
+});
 </script>
 
 <template>
@@ -217,10 +251,14 @@ const isOptional = computed(() => !isRequired.value && attrs.value["optional"] !
             </span>
         </div>
         <div v-if="showField" class="ui-form-field" :data-label="props.title">
-            <FormBoolean v-if="props.type === 'boolean'" :id="props.id" v-model="currentValue" />
-            <FormHidden v-else-if="isHiddenType" :id="props.id" v-model="currentValue" :info="attrs['info']" />
+            <FormBoolean v-if="elementType === 'boolean'" :id="props.id" v-model="currentValue" />
+            <FormHidden
+                v-else-if="elementType === 'hidden'"
+                :id="props.id"
+                v-model="currentValue"
+                :info="attrs['info']" />
             <FormNumber
-                v-else-if="props.type === 'integer' || props.type === 'float'"
+                v-else-if="elementType === 'number'"
                 :id="props.id"
                 v-model="currentValue"
                 :max="attrs.max"
@@ -228,7 +266,7 @@ const isOptional = computed(() => !isRequired.value && attrs.value["optional"] !
                 :type="props.type ?? 'float'"
                 :workflow-building-mode="workflowBuildingMode" />
             <FormOptionalText
-                v-else-if="props.type === 'select' && attrs.is_workflow && attrs.optional"
+                v-else-if="elementType === 'optional_text'"
                 :id="id"
                 v-model="currentValue"
                 :readonly="attrs.readonly"
@@ -239,11 +277,7 @@ const isOptional = computed(() => !isRequired.value && attrs.value["optional"] !
                 :datalist="attrs.datalist"
                 :type="props.type" />
             <FormText
-                v-else-if="
-                    ['text', 'password'].includes(props.type) ||
-                    (attrs.is_workflow &&
-                        ['data_column', 'drill_down', 'genomebuild', 'group_tag', 'select'].includes(props.type))
-                "
+                v-else-if="elementType === 'text'"
                 :id="id"
                 v-model="currentValue"
                 :readonly="attrs.readonly"
@@ -256,10 +290,7 @@ const isOptional = computed(() => !isRequired.value && attrs.value["optional"] !
                 :datalist="attrs.datalist"
                 :type="props.type" />
             <FormSelection
-                v-else-if="
-                    (props.type === undefined && attrs.options) ||
-                    ['data_column', 'genomebuild', 'group_tag', 'select'].includes(props.type)
-                "
+                v-else-if="elementType === 'selection'"
                 :id="id"
                 v-model="currentValue"
                 :data="attrs.data"
@@ -268,15 +299,15 @@ const isOptional = computed(() => !isRequired.value && attrs.value["optional"] !
                 :optional="attrs.optional"
                 :multiple="attrs.multiple" />
             <FormDrilldown
-                v-else-if="props.type === 'drill_down'"
+                v-else-if="elementType === 'drill_down'"
                 :id="id"
                 v-model="currentValue"
                 :options="attrs.options"
                 :multiple="attrs.multiple" />
-            <FormColor v-else-if="props.type === 'color'" :id="props.id" v-model="currentValue" />
-            <FormDirectory v-else-if="props.type === 'directory_uri'" v-model="currentValue" />
-            <FormUpload v-else-if="props.type === 'upload'" v-model="currentValue" />
-            <FormRulesEdit v-else-if="props.type == 'rules'" v-model="currentValue" :target="attrs.target" />
+            <FormColor v-else-if="elementType === 'color'" :id="props.id" v-model="currentValue" />
+            <FormDirectory v-else-if="elementType === 'directory_uri'" v-model="currentValue" />
+            <FormUpload v-else-if="elementType === 'upload'" v-model="currentValue" />
+            <FormRulesEdit v-else-if="elementType == 'rules'" v-model="currentValue" :target="attrs.target" />
             <FormParameter
                 v-else-if="backbonejs"
                 :id="props.id"
