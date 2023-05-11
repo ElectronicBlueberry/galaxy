@@ -75,9 +75,7 @@ const position = computed(() => {
 
 const outputIsMappedOver = computed(() => stepStore.stepMapOver[props.connection.output.stepId]?.isCollection);
 const inputIsMappedOver = computed(
-    () =>
-        stepStore.stepInputMapOver[props.connection.input.stepId] &&
-        stepStore.stepInputMapOver[props.connection.input.stepId][props.connection.input.name]?.isCollection
+    () => stepStore.stepInputMapOver[props.connection.input.stepId]?.[props.connection.input.name]?.isCollection
 );
 
 const outputIsOptional = computed(() => {

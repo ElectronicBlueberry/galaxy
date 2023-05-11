@@ -6,7 +6,6 @@ import ExportRecordDetails from "components/Common/ExportRecordDetails.vue";
 import ExportRecordTable from "components/Common/ExportRecordTable.vue";
 import ExportOptions from "./ExportOptions.vue";
 import ExportForm from "components/Common/ExportForm.vue";
-import { getHistoryById } from "@/store/historyStore/model/queries";
 import { getExportRecords, exportToFileSource, reimportHistoryFromRecord } from "./services";
 import { useTaskMonitor } from "composables/taskMonitor";
 import { useFileSources } from "composables/fileSources";
@@ -17,6 +16,7 @@ import { absPath } from "@/utils/redirect";
 import { faFileExport } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import { useHistoryStore } from "@/stores/historyStore";
 
 const {
     isRunning: isExportTaskRunning,
@@ -74,6 +74,8 @@ const availableRecordsMessage = computed(() =>
 const errorMessage = ref(null);
 const actionMessage = ref(null);
 const actionMessageVariant = ref(null);
+
+const { getHistoryById } = useHistoryStore();
 
 onMounted(async () => {
     updateExports();
