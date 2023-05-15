@@ -17,10 +17,10 @@ import { ref, computed, useAttrs } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faExclamation, faTimes, faArrowsAltH } from "@fortawesome/free-solid-svg-icons";
 import { faCaretSquareDown, faCaretSquareUp } from "@fortawesome/free-regular-svg-icons";
+import { ensureDrilldownOptionArray } from "./typeguards";
 
 import type { ComputedRef } from "vue";
 import type { FormParameterTypes, FormParameterAttributes, FormParameterValue } from "./parameterTypes";
-import { ensureDefined } from "@/utils/assertions";
 
 interface FormElementProps {
     id?: string;
@@ -301,12 +301,7 @@ const elementType = computed(() => {
                 v-else-if="elementType === 'drill_down'"
                 :id="id"
                 v-model="currentValue"
-                :options="
-                    ensureDefined(
-                        attrs.options,
-                        'attribute `options` needs to be defined on element of type `drill_down`'
-                    )
-                "
+                :options="ensureDrilldownOptionArray(attrs.options)"
                 :multiple="attrs.multiple" />
             <FormColor v-else-if="elementType === 'color'" :id="props.id" v-model="currentValue" />
             <FormDirectory v-else-if="elementType === 'directory_uri'" v-model="currentValue" />

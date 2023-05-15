@@ -22,7 +22,7 @@ export type FormParameterOptions =
 export type FormParameterAttributes = {
     is_workflow: boolean;
     optional: boolean;
-    display: Array<"radio", "checkboxes">;
+    display?: "radio" | "checkboxes";
     options?: FormParameterOptions;
     [attribute: string]: any;
 };

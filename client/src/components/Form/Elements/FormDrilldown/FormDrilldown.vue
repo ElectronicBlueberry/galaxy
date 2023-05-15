@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { computed, type ComputedRef, watch } from "vue";
+import { computed, type ComputedRef } from "vue";
 import FormDrilldownList from "./FormDrilldownList.vue";
-import { assertOptionsFormat, getAllValues, type Option, type Value } from "./utilities";
-import type { FormParameterOptions } from "@/components/Form/parameterTypes";
+import { getAllValues, type Option, type Value } from "./utilities";
 
 const props = withDefaults(
     defineProps<{
         id: string;
         value?: Value;
-        options: FormParameterOptions;
+        options: Option[];
         multiple?: boolean;
     }>(),
     {
@@ -21,19 +20,13 @@ const emit = defineEmits<{
     (e: "input", value: Value): void;
 }>();
 
-watch(
-    () => props.options,
-    () => assertOptionsFormat(props.options)
-);
-const options = computed(() => props.options as Option[]);
-
 const hasOptions = computed(() => {
     return props.options.length > 0;
 });
 
 // Determine all available values
 const allValues: ComputedRef<string[]> = computed(() => {
-    return getAllValues(options.value);
+    return getAllValues(props.options);
 });
 
 // Determine current value
