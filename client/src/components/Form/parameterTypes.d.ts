@@ -1,9 +1,29 @@
+import type { Option } from "./Elements/FormDrilldown/utilities";
+
 // TODO: stricter types
 export type FormParameterValue = any;
+
+export type FormParameterDrilldownOption = Option;
+
+export type FormParameterOptionObject = {
+    text: string;
+    value: FormParameterValue;
+    disabled?: boolean;
+};
+
+type Label = string;
+export type FormParameterOptionTuple = [Label, FormParameterValue];
+
+export type FormParameterOptions =
+    | FormParameterDrilldownOption[]
+    | FormParameterOptionObject[]
+    | FormParameterOptionTuple[];
+
 export type FormParameterAttributes = {
     is_workflow: boolean;
     optional: boolean;
     display: Array<"radio", "checkboxes">;
+    options?: FormParameterOptions;
     [attribute: string]: any;
 };
 

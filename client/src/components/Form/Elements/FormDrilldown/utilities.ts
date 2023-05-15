@@ -1,3 +1,5 @@
+import type { FormParameterOptions } from "../../parameterTypes";
+
 export interface Option {
     name: string;
     value: string;
@@ -26,4 +28,23 @@ export function getAllValues(headOptions: Array<Option>): string[] {
         });
     }
     return values;
+}
+
+/**
+ * Asserts whether the options Array passed in has the expected format
+ * @param options
+ */
+export function assertOptionsFormat(options: FormParameterOptions): asserts options is Option[] {
+    const first = options[0];
+
+    if (first) {
+        const keys = Object.keys(first);
+
+        // only DrilldownOptions have a "name" field
+        const valid = keys.includes("name");
+
+        if (!valid) {
+            throw new TypeError("Unexpected type for FormDrilldownOptions");
+        }
+    }
 }
