@@ -14,7 +14,7 @@ const props = withDefaults(
         multiple?: boolean;
         optional?: boolean;
         options: Array<[string, string]>;
-        value?: Array<string> | string;
+        value?: Array<string> | string | null;
     }>(),
     {
         multiple: false,
