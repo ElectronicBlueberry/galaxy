@@ -7380,6 +7380,13 @@ class Workflow(Base, Dictifiable, RepresentById):
         cascade="all, delete-orphan",
         lazy=False,
     )
+    annotations: List["WorkflowAnnotation"] = relationship(
+        "WorkflowAnnotation",
+        back_populates="workflow",
+        primaryjoin=(lambda: Workflow.id == WorkflowAnnotation.workflow_id),  # type: ignore[has-type]
+        cascade="all, delete-orphan",
+        lazy=False,
+    )
     parent_workflow_steps = relationship(
         "WorkflowStep",
         primaryjoin=(lambda: Workflow.id == WorkflowStep.subworkflow_id),  # type: ignore[has-type]
@@ -7952,6 +7959,36 @@ class WorkflowOutput(Base, Serializable):
             label=self.label,
             uuid=str(self.uuid),
         )
+
+
+class WorkflowAnnotation(Base, RepresentById):
+    """
+    WorkflowAnnotation represents an in-editor annotaion which is no associated to any WorkflowStep.
+    It is purely decorative, and should not influence how a workflow is ran.
+    """
+
+    __tablename__ = "workflow_annotation"
+
+    id = Column(Integer, primary_key=True)
+    workflow_id = Column(Integer, ForeignKey("workflow.id"), index=True, nullable=False)
+    position = Column(MutableJSONType)
+    size = Column(JSONType)
+    type = Column(String(16))
+    colour = Column(String(16))
+    data = Column(JSONType)
+    workflow = relationship(
+        "Workflow", primaryjoin=(lambda: Workflow.id == WorkflowAnnotation.workflow_id), back_populates="annotations"
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "position": self.position,
+            "size": self.size,
+            "type": self.type,
+            "colour": self.colour,
+            "data": self.data,
+        }
 
 
 class StoredWorkflowUserShareAssociation(Base, UserShareAssociation):
