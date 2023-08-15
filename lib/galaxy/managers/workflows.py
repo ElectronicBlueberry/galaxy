@@ -1114,6 +1114,7 @@ class WorkflowContentsManager(UsesAnnotations):
         data["creator"] = workflow.creator_metadata
         data["source_metadata"] = workflow.source_metadata
         data["annotation"] = self.get_item_annotation_str(trans.sa_session, trans.user, stored) or ""
+        data["annotations"] = [annotation.to_dict() for annotation in workflow.annotations]
 
         output_label_index = set()
         input_step_types = set(workflow.input_step_types)
@@ -1349,6 +1350,7 @@ class WorkflowContentsManager(UsesAnnotations):
             data["uuid"] = str(workflow.uuid)
         steps: Dict[int, Dict[str, Any]] = {}
         data["steps"] = steps
+        data["annotations"] = [annotation.to_dict() for annotation in workflow.annotations]
         if workflow.reports_config:
             data["report"] = workflow.reports_config
         if workflow.creator_metadata:
