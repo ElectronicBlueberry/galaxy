@@ -801,6 +801,13 @@ class WorkflowContentsManager(UsesAnnotations):
             # Order the steps if possible
             attach_ordered_steps(workflow)
 
+        annotations: List[model.WorkflowAnnotation] = []
+        for annotation_dict in data.get("annotations", []):
+            annotation = model.WorkflowAnnotation.from_dict(annotation_dict)
+            annotations.append(annotation)
+
+        workflow.annotations = annotations
+
         return workflow, missing_tool_tups
 
     def workflow_to_dict(self, trans, stored, style="export", version=None, history=None):

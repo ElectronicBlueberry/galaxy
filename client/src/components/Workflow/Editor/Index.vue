@@ -234,8 +234,9 @@ export default {
     setup(props, { emit }) {
         const { datatypes, datatypesMapper, datatypesMapperLoading } = useDatatypesMapper();
 
-        const { connectionStore, stepStore, stateStore } = provideScopedWorkflowStores(props.id);
+        const { connectionStore, stepStore, stateStore, annotationStore } = provideScopedWorkflowStores(props.id);
 
+        const { annotations } = storeToRefs(annotationStore);
         const { getStepIndex, steps } = storeToRefs(stepStore);
         const { activeNodeId } = storeToRefs(stateStore);
         const activeStep = computed(() => {
@@ -257,16 +258,19 @@ export default {
             stepStore.$reset();
             stateStore.$reset();
         }
+
         onUnmounted(() => {
             resetStores();
             emit("update:confirmation", false);
         });
+
         return {
             connectionStore,
             hasChanges,
             hasInvalidConnections,
             stepStore,
             steps,
+            annotations,
             nodeIndex: getStepIndex,
             datatypes,
             activeStep,

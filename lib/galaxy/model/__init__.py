@@ -7990,6 +7990,15 @@ class WorkflowAnnotation(Base, RepresentById):
             "data": self.data,
         }
 
+    def from_dict(dict):
+        annotation = WorkflowAnnotation()
+        annotation.type = dict.get("type", "text")
+        annotation.position = dict.get("position", [0, 0])
+        annotation.size = dict.get("size", [100, 100])
+        annotation.colour = dict.get("colour", "none")
+        annotation.data = dict.get("data", "")
+        return annotation
+
 
 class StoredWorkflowUserShareAssociation(Base, UserShareAssociation):
     __tablename__ = "stored_workflow_user_share_connection"
