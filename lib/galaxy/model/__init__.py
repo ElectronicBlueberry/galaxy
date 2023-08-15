@@ -7982,7 +7982,6 @@ class WorkflowAnnotation(Base, RepresentById):
 
     def to_dict(self):
         return {
-            "id": self.id,
             "position": self.position,
             "size": self.size,
             "type": self.type,

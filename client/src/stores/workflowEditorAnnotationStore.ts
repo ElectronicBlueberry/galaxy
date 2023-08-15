@@ -5,7 +5,6 @@ type WorkflowAnnotationColours = "none" | "red" | "green" | "blue" | "orange" | 
 
 export interface BaseWorkflowAnnotation {
     type: string;
-    id: string;
     colour: WorkflowAnnotationColours;
     position: [number, number];
     size: [number, number];
