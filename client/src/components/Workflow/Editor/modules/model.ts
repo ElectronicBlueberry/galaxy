@@ -1,3 +1,4 @@
+import { useWorkflowAnnotationStore, type WorkflowAnnotation } from "@/stores/workflowEditorAnnotationStore";
 import { type ConnectionOutputLink, type Steps, useWorkflowStepStore } from "@/stores/workflowStepStore";
 
 interface Workflow {
@@ -8,6 +9,7 @@ interface Workflow {
     version: number;
     report: any;
     steps: Steps;
+    annotations: WorkflowAnnotation[];
 }
 
 /**
@@ -25,7 +27,10 @@ export async function fromSimple(
     defaultPosition = { top: 0, left: 0 }
 ) {
     const stepStore = useWorkflowStepStore(id);
+    const annotationStore = useWorkflowAnnotationStore(id);
+
     const stepIdOffset = stepStore.getStepIndex + 1;
+
     Object.values(data.steps).forEach((step) => {
         // If workflow being copied into another, wipe UUID and let
         // Galaxy assign new ones.
@@ -59,14 +64,20 @@ export async function fromSimple(
     Object.values(data.steps).map((step) => {
         stepStore.addStep(step);
     });
+
+    // Do not load annotations in append mode
+    if (!appendData) {
+        annotationStore.annotations = data.annotations;
+    }
 }
 
 export function toSimple(workflow: Workflow) {
     const steps = workflow.steps;
+    const annotations = workflow.annotations;
     const report = workflow.report;
     const license = workflow.license;
     const creator = workflow.creator;
     const annotation = workflow.annotation;
     const name = workflow.name;
-    return { steps, report, license, creator, annotation, name };
+    return { steps, report, license, creator, annotation, name, annotations };
 }
