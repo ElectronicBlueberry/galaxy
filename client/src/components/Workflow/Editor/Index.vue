@@ -249,7 +249,11 @@ export default {
         const hasChanges = ref(false);
         const hasInvalidConnections = computed(() => Object.keys(connectionStore.invalidConnections).length > 0);
 
-        stepStore.$subscribe((mutation, state) => {
+        stepStore.$subscribe((_mutation, _state) => {
+            hasChanges.value = true;
+        });
+
+        annotationStore.$subscribe((_mutation, _state) => {
             hasChanges.value = true;
         });
 
@@ -257,6 +261,7 @@ export default {
             connectionStore.$reset();
             stepStore.$reset();
             stateStore.$reset();
+            annotationStore.$reset();
         }
 
         onUnmounted(() => {
