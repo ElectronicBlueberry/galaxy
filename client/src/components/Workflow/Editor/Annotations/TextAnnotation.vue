@@ -73,6 +73,12 @@ function onMove(position: { x: number; y: number }) {
 <template>
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions vuejs-accessibility/click-events-have-key-events -->
     <div ref="rootElement" class="text-workflow-annotation prevent-zoom" @click="onRootClick" @mouseup="onMouseUp">
+        <DraggablePan
+            :root-offset="reactive(props.rootOffset)"
+            :scale="props.scale"
+            class="draggable-pan"
+            @move="onMove"
+            @pan-by="(p) => emit('pan-by', p)" />
         <span
             ref="editableElement"
             class="prevent-zoom"
@@ -80,12 +86,6 @@ function onMove(position: { x: number; y: number }) {
             spellcheck="false"
             @blur="onTextInput"
             v-html="escapeAndSanitize(props.annotation.data)" />
-        <DraggablePan
-            :root-offset="reactive(props.rootOffset)"
-            :scale="props.scale"
-            class="draggable-pan"
-            @move="onMove"
-            @pan-by="(p) => emit('pan-by', p)" />
     </div>
 </template>
 
@@ -109,6 +109,8 @@ function onMove(position: { x: number; y: number }) {
     position: absolute;
 
     span {
+        position: absolute;
+
         &:focus,
         &:focus-visible {
             border: none;
