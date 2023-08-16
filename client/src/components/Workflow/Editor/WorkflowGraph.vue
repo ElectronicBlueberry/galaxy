@@ -30,6 +30,11 @@
                     @onActivate="onActivate"
                     @onDeactivate="onDeactivate"
                     v-on="$listeners" />
+                <WorkflowAnnotation
+                    v-for="annotation in annotations"
+                    :id="`workflow-annotation-${annotation.id}`"
+                    :key="annotation.id"
+                    :annotation="annotation" />
             </div>
         </div>
         <WorkflowMinimap
@@ -58,6 +63,7 @@ import type { OutputTerminals } from "./modules/terminals";
 import { maxZoom, minZoom } from "./modules/zoomLevels";
 
 import AdaptiveGrid from "./AdaptiveGrid.vue";
+import WorkflowAnnotation from "./Annotations/WorkflowAnnotation.vue";
 import WorkflowNode from "@/components/Workflow/Editor/Node.vue";
 import WorkflowEdges from "@/components/Workflow/Editor/WorkflowEdges.vue";
 import WorkflowMinimap from "@/components/Workflow/Editor/WorkflowMinimap.vue";
@@ -154,6 +160,9 @@ watchEffect(() => {
 const canvasStyle = computed(() => {
     return { transform: `translate(${transform.value.x}px, ${transform.value.y}px) scale(${transform.value.k})` };
 });
+
+const { annotationStore } = useWorkflowStores();
+const { annotations } = storeToRefs(annotationStore);
 </script>
 
 <style scoped land="scss">

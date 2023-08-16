@@ -4,6 +4,7 @@ import { ref } from "vue";
 type WorkflowAnnotationColours = "none" | "red" | "green" | "blue" | "orange" | "pink";
 
 export interface BaseWorkflowAnnotation {
+    id: number;
     type: string;
     colour: WorkflowAnnotationColours;
     position: [number, number];
@@ -11,22 +12,22 @@ export interface BaseWorkflowAnnotation {
     data: unknown;
 }
 
-export interface TextWorkflowAnnotation {
+export interface TextWorkflowAnnotation extends BaseWorkflowAnnotation {
     type: "text";
     data: string;
 }
 
-export interface MarkdownWorkflowAnnotation {
+export interface MarkdownWorkflowAnnotation extends BaseWorkflowAnnotation {
     type: "markdown";
     data: string;
 }
 
-export interface ContainerWorkflowAnnotation {
-    type: "container";
+export interface GroupWorkflowAnnotation extends BaseWorkflowAnnotation {
+    type: "group";
     data: string;
 }
 
-export interface FreehandWorkflowAnnotation {
+export interface FreehandWorkflowAnnotation extends BaseWorkflowAnnotation {
     type: "freehand";
     data: {
         thickness: number;
@@ -37,7 +38,7 @@ export interface FreehandWorkflowAnnotation {
 export type WorkflowAnnotation =
     | TextWorkflowAnnotation
     | MarkdownWorkflowAnnotation
-    | ContainerWorkflowAnnotation
+    | GroupWorkflowAnnotation
     | FreehandWorkflowAnnotation;
 
 export const useWorkflowAnnotationStore = (workflowId: string) => {
