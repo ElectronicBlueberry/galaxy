@@ -83,7 +83,7 @@ function onMove(position: { x: number; y: number }) {
         <DraggablePan
             :root-offset="reactive(props.rootOffset)"
             :scale="props.scale"
-            style="position: absolute; width: 100%; height: 100%"
+            class="draggable-pan"
             @move="onMove"
             @pan-by="(p) => emit('pan-by', p)" />
     </div>
@@ -120,6 +120,13 @@ function onMove(position: { x: number; y: number }) {
     &:focus {
         resize: both;
         border-color: $brand-primary;
+    }
+
+    .draggable-pan {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
     }
 }
 </style>
