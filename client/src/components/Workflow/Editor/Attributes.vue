@@ -93,7 +93,7 @@ export default {
             default: "",
         },
         creator: {
-            type: Object,
+            type: Array,
             default: null,
         },
         version: {
