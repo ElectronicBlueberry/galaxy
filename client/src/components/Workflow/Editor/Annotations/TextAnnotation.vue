@@ -41,7 +41,7 @@ function escapeAndSanitize(text: string) {
     return sanitize(text, { ALLOWED_TAGS: [] });
 }
 
-function onTextInput(_event: Event) {
+function saveText() {
     const element = editableElement.value;
 
     if (element) {
@@ -63,6 +63,8 @@ function onMouseUp(_event: MouseEvent) {
 
         emit("resize", [width, height]);
     }
+
+    saveText();
 }
 
 function onMove(position: { x: number; y: number }) {
@@ -78,13 +80,15 @@ function onMove(position: { x: number; y: number }) {
             :scale="props.scale"
             class="draggable-pan"
             @move="onMove"
+            @mouseup="saveText"
             @pan-by="(p) => emit('pan-by', p)" />
         <span
             ref="editableElement"
             class="prevent-zoom"
             contenteditable
             spellcheck="false"
-            @blur="onTextInput"
+            @blur="saveText"
+            @mouseup.stop
             v-html="escapeAndSanitize(props.annotation.data)" />
     </div>
 </template>
@@ -96,8 +100,8 @@ function onMove(position: { x: number; y: number }) {
     width: 100%;
     height: 100%;
 
-    min-height: 1.75em;
-    min-width: 1.75em;
+    min-height: calc(1.75em + 10px);
+    min-width: calc(1.75em + 20px);
 
     border-color: transparent;
     border-radius: 0.25rem;
@@ -110,6 +114,7 @@ function onMove(position: { x: number; y: number }) {
 
     span {
         position: absolute;
+        margin: 5px 10px;
 
         &:focus,
         &:focus-visible {
