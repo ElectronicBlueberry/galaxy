@@ -28,7 +28,7 @@ const props = defineProps({
         default: null,
     },
     disabled: {
-        tyoe: Boolean,
+        type: Boolean,
         default: false,
     },
 });

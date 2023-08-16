@@ -34,7 +34,11 @@
                     v-for="annotation in annotations"
                     :id="`workflow-annotation-${annotation.id}`"
                     :key="annotation.id"
-                    :annotation="annotation" />
+                    :annotation="annotation"
+                    :scale="scale"
+                    :readonly="readonly"
+                    :root-offset="elementBounding"
+                    @pan-by="panBy" />
             </div>
         </div>
         <WorkflowMinimap
