@@ -45,8 +45,13 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
     return defineStore(`workflowAnnotationStore${workflowId}`, () => {
         const annotations = ref<WorkflowAnnotation[]>([]);
 
+        const $reset = () => {
+            annotations.value = [];
+        };
+
         return {
             annotations,
+            $reset,
         };
     })();
 };
