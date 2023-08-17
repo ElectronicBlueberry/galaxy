@@ -51,8 +51,8 @@ export type WorkflowAnnotation =
 
 function assertAnnotationDataValid(
     annotationType: WorkflowAnnotation["type"],
-    annotationData: WorkflowAnnotation["data"]
-) {
+    annotationData: unknown
+): asserts annotationData is WorkflowAnnotation["data"] {
     const valid = match(annotationType, {
         text: () => hasKeys(annotationData, ["text", "size"]),
         markdown: () => typeof annotationData === "string",
@@ -96,7 +96,7 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             set(annotation, "size", size);
         };
 
-        const changeData = (id: number, data: any) => {
+        const changeData = (id: number, data: unknown) => {
             const annotation = getAnnotation(id);
             assertAnnotationDataValid(annotation.type, data);
             set(annotation, "data", data);
