@@ -30,16 +30,20 @@ const cssVariables = computed(() => ({
 
 const { annotationStore } = useWorkflowStores();
 
-function onUpdateText(text: string) {
-    annotationStore.editAnnotation(props.annotation.id, { data: text });
+function onUpdateData(data: any) {
+    annotationStore.changeData(props.annotation.id, data);
 }
 
 function onResize(size: [number, number]) {
-    annotationStore.editAnnotation(props.annotation.id, { size });
+    annotationStore.changeSize(props.annotation.id, size);
 }
 
 function onMove(position: [number, number]) {
-    annotationStore.editAnnotation(props.annotation.id, { position });
+    annotationStore.changePosition(props.annotation.id, position);
+}
+
+function onRemove() {
+    annotationStore.deleteAnnotation(props.annotation.id);
 }
 </script>
 
@@ -51,10 +55,11 @@ function onMove(position: [number, number]) {
             :scale="props.scale"
             :readonly="props.readonly"
             :root-offset="props.rootOffset"
-            @change="onUpdateText"
+            @change="onUpdateData"
             @resize="onResize"
             @move="onMove"
-            @pan-by="(p) => emit('pan-by', p)" />
+            @panBy="(p) => emit('pan-by', p)"
+            @remove="onRemove" />
         <MarkdownAnnotation v-else-if="props.annotation.type === 'markdown'" :annotation="props.annotation" />
         <GroupAnnotation v-else-if="props.annotation.type === 'group'" :annotation="props.annotation" />
         <FreehandAnnotation v-else-if="props.annotation.type === 'freehand'" :annotation="props.annotation" />

@@ -73,11 +73,15 @@ export async function fromSimple(
 
 export function toSimple(workflow: Workflow) {
     const steps = workflow.steps;
-    const annotations = workflow.annotations;
     const report = workflow.report;
     const license = workflow.license;
     const creator = workflow.creator;
     const annotation = workflow.annotation;
     const name = workflow.name;
+
+    const annotations = workflow.annotations.filter(
+        (annotation) => !(annotation.type === "text" && annotation.data.text === "")
+    );
+
     return { steps, report, license, creator, annotation, name, annotations };
 }

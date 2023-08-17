@@ -1,14 +1,15 @@
 import { defineStore } from "pinia";
-import { computed, ref, set } from "vue";
+import { computed, del, ref, set } from "vue";
 
 import { assertDefined } from "@/utils/assertions";
+import { hasKeys, match } from "@/utils/utils";
 
-type WorkflowAnnotationColours = "none" | "red" | "green" | "blue" | "orange" | "pink";
+type WorkflowAnnotationColour = "none" | "red" | "green" | "blue" | "orange" | "pink";
 
 export interface BaseWorkflowAnnotation {
     id: number;
     type: string;
-    colour: WorkflowAnnotationColours;
+    colour: WorkflowAnnotationColour;
     position: [number, number];
     size: [number, number];
     data: unknown;
@@ -16,7 +17,12 @@ export interface BaseWorkflowAnnotation {
 
 export interface TextWorkflowAnnotation extends BaseWorkflowAnnotation {
     type: "text";
-    data: string;
+    data: {
+        bold?: true;
+        italic?: true;
+        size: number;
+        text: string;
+    };
 }
 
 export interface MarkdownWorkflowAnnotation extends BaseWorkflowAnnotation {
@@ -43,6 +49,24 @@ export type WorkflowAnnotation =
     | GroupWorkflowAnnotation
     | FreehandWorkflowAnnotation;
 
+function assertAnnotationDataValid(
+    annotationType: WorkflowAnnotation["type"],
+    annotationData: WorkflowAnnotation["data"]
+) {
+    const valid = match(annotationType, {
+        text: () => hasKeys(annotationData, ["text", "size"]),
+        markdown: () => typeof annotationData === "string",
+        group: () => typeof annotationData === "string",
+        freehand: () => hasKeys(annotationData, ["thickness", "line"]),
+    });
+
+    if (!valid) {
+        throw new TypeError(
+            `Object "${annotationData}" is not a valid data object for an ${annotationType} annotation`
+        );
+    }
+}
+
 export const useWorkflowAnnotationStore = (workflowId: string) => {
     return defineStore(`workflowAnnotationStore${workflowId}`, () => {
         const annotationsRecord = ref<Record<string, WorkflowAnnotation>>({});
@@ -56,24 +80,47 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             annotationsArray.forEach((annotation) => set(annotationsRecord.value, annotation.id, annotation));
         };
 
-        const editAnnotation = (id: number, edits: Partial<BaseWorkflowAnnotation>) => {
+        const getAnnotation = (id: number) => {
             const annotation = annotationsRecord.value[id];
             assertDefined(annotation);
+            return annotation;
+        };
 
-            Object.entries(edits).forEach(([key, value]) => {
-                if (key === "id") {
-                    throw new Error("WorkflowAnnotation id is immutable.");
-                }
+        const changePosition = (id: number, position: [number, number]) => {
+            const annotation = getAnnotation(id);
+            set(annotation, "position", position);
+        };
 
-                set(annotation, key, value);
-            });
+        const changeSize = (id: number, size: [number, number]) => {
+            const annotation = getAnnotation(id);
+            set(annotation, "size", size);
+        };
+
+        const changeData = (id: number, data: any) => {
+            const annotation = getAnnotation(id);
+            assertAnnotationDataValid(annotation.type, data);
+            set(annotation, "data", data);
+        };
+
+        const changeColour = (id: number, colour: WorkflowAnnotationColour) => {
+            const annotation = getAnnotation(id);
+            set(annotation, "colour", colour);
+        };
+
+        const deleteAnnotation = (id: number) => {
+            del(annotationsRecord.value, id);
         };
 
         return {
             annotations,
             annotationsRecord,
             addAnnotations,
-            editAnnotation,
+            getAnnotation,
+            changePosition,
+            changeSize,
+            changeData,
+            changeColour,
+            deleteAnnotation,
             $reset,
         };
     })();

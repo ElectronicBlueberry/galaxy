@@ -15,10 +15,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: "change", data: string): void;
+    (e: "change", data: TextWorkflowAnnotation["data"]): void;
     (e: "resize", size: [number, number]): void;
     (e: "move", position: [number, number]): void;
-    (e: "pan-by", position: { x: number; y: number }): void;
+    (e: "panBy", position: { x: number; y: number }): void;
+    (e: "remove"): void;
 }>();
 
 // override user resize if size changes externally
@@ -38,16 +39,22 @@ const editableElement = ref<HTMLSpanElement>();
 const rootElement = ref<HTMLDivElement>();
 
 function escapeAndSanitize(text: string) {
-    return sanitize(text, { ALLOWED_TAGS: [] });
+    return sanitize(text, { ALLOWED_TAGS: [] }).replace(/(?:^(\s|&nbsp;)+)|(?:(\s|&nbsp;)+$)/g, "");
 }
 
-function saveText() {
+function getInnerText() {
     const element = editableElement.value;
 
     if (element) {
         const value = element.innerHTML ?? "";
-        emit("change", escapeAndSanitize(value));
+        return escapeAndSanitize(value);
+    } else {
+        return "";
     }
+}
+
+function saveText() {
+    emit("change", { ...props.annotation.data, text: getInnerText() });
 }
 
 function onRootClick() {
@@ -70,6 +77,14 @@ function onMouseUp(_event: MouseEvent) {
 function onMove(position: { x: number; y: number }) {
     emit("move", [position.x, position.y]);
 }
+
+function onBlur() {
+    if (getInnerText() === "") {
+        emit("remove");
+    } else {
+        saveText();
+    }
+}
 </script>
 
 <template>
@@ -81,15 +96,15 @@ function onMove(position: { x: number; y: number }) {
             class="draggable-pan"
             @move="onMove"
             @mouseup="saveText"
-            @pan-by="(p) => emit('pan-by', p)" />
+            @pan-by="(p) => emit('panBy', p)" />
         <span
             ref="editableElement"
             class="prevent-zoom"
             contenteditable
             spellcheck="false"
-            @blur="saveText"
+            @blur="onBlur"
             @mouseup.stop
-            v-html="escapeAndSanitize(props.annotation.data)" />
+            v-html="escapeAndSanitize(props.annotation.data.text)" />
     </div>
 </template>
 
