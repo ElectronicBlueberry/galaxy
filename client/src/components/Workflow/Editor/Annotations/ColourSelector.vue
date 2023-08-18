@@ -17,7 +17,7 @@ function onClickColour(colour: string) {
 <template>
     <div class="annotation-colour-selector">
         <button
-            class="colour-button"
+            class="colour-button prevent-zoom"
             :class="{ selected: props.colour === 'none' }"
             @click="() => onClickColour('none')">
             <span class="sr-only">none</span>
@@ -25,7 +25,7 @@ function onClickColour(colour: string) {
         <button
             v-for="(hex, name) in colours"
             :key="name"
-            class="colour-button"
+            class="colour-button prevent-zoom"
             :class="{ selected: props.colour === name }"
             :style="{
                 '--colour': hex,
