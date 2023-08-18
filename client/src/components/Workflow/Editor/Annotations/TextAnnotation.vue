@@ -47,7 +47,7 @@ const editableElement = ref<HTMLSpanElement>();
 const resizeContainer = ref<HTMLDivElement>();
 
 function escapeAndSanitize(text: string) {
-    return sanitize(text, { ALLOWED_TAGS: [] }).replace(/(?:^(\s|&nbsp;)+)|(?:(\s|&nbsp;)+$)/g, "");
+    return sanitize(text, { ALLOWED_TAGS: ["br"] }).replace(/(?:^(\s|&nbsp;)+)|(?:(\s|&nbsp;)+$)/g, "");
 }
 
 function getInnerText() {
@@ -249,8 +249,8 @@ async function onFocusOut() {
     width: 100%;
     height: 100%;
 
-    min-height: calc(1.5em + 10px);
-    min-width: calc(1.5em + 20px);
+    min-height: calc(1em + 10px);
+    min-width: calc(1em + 20px);
 
     border-color: transparent;
     border-radius: 0.25rem;
@@ -264,6 +264,7 @@ async function onFocusOut() {
     span {
         position: absolute;
         margin: 5px 10px;
+        line-height: 1;
 
         &.bold {
             font-weight: 700;
