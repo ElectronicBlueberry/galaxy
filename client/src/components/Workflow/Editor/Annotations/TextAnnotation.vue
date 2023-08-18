@@ -86,7 +86,7 @@ function toggleItalic() {
 function increaseFontSize() {
     const size = props.annotation.data.size;
 
-    if (size < 8) {
+    if (size < 5) {
         emit("change", { ...props.annotation.data, size: size + 1 });
     }
 }
@@ -176,7 +176,7 @@ async function onFocusOut() {
 
         <BButtonGroup class="style-buttons">
             <BButton
-                class="button font-weight-bold"
+                class="button font-weight-bold prevent-zoom"
                 variant="outline-primary"
                 title="bold"
                 :pressed="props.annotation.data.bold"
@@ -184,19 +184,23 @@ async function onFocusOut() {
                 B
             </BButton>
             <BButton
-                class="button font-italic"
+                class="button font-italic prevent-zoom"
                 variant="outline-primary"
                 title="italic"
                 :pressed="props.annotation.data.italic"
                 @click="toggleItalic">
                 I
             </BButton>
-            <BButton class="button" variant="primary" title="colour">
+            <BButton class="button prevent-zoom" variant="primary" title="colour">
                 <FontAwesomeIcon icon="fa-palette" />
             </BButton>
-            <BButton class="button" variant="primary" title="decrease font size" @click="decreaseFontSize"> a </BButton>
-            <BButton class="button" variant="primary" title="increase font size" @click="increaseFontSize"> A </BButton>
-            <BButton class="button" variant="dark" title="delete annotation" @click="() => emit('remove')">
+            <BButton class="button prevent-zoom" variant="primary" title="decrease font size" @click="decreaseFontSize">
+                a
+            </BButton>
+            <BButton class="button prevent-zoom" variant="primary" title="increase font size" @click="increaseFontSize">
+                A
+            </BButton>
+            <BButton class="button prevent-zoom" variant="dark" title="delete annotation" @click="() => emit('remove')">
                 <FontAwesomeIcon icon="far fa-trash-alt" />
             </BButton>
         </BButtonGroup>
