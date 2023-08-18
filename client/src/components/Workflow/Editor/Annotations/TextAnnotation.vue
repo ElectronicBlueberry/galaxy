@@ -6,11 +6,14 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { UseElementBoundingReturn } from "@vueuse/core";
 import { BButton, BButtonGroup } from "bootstrap-vue";
 import { sanitize } from "dompurify";
-import { reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 import type { TextWorkflowAnnotation } from "@/stores/workflowEditorAnnotationStore";
 import { wait } from "@/utils/utils";
 
+import { type Colour, colours } from "./colours";
+
+import ColourSelector from "./ColourSelector.vue";
 import DraggablePan from "@/components/Workflow/Editor/DraggablePan.vue";
 
 library.add(faTrashAlt, faPalette);
@@ -28,6 +31,7 @@ const emit = defineEmits<{
     (e: "move", position: [number, number]): void;
     (e: "panBy", position: { x: number; y: number }): void;
     (e: "remove"): void;
+    (e: "setColour", colour: string): void;
 }>();
 
 // override user resize if size changes externally
@@ -133,6 +137,8 @@ async function onFocusOut() {
     await wait(0);
 
     if (!hasFocus) {
+        showColourSelector.value = false;
+
         if (getInnerText() === "") {
             emit("remove");
         } else {
@@ -140,6 +146,24 @@ async function onFocusOut() {
         }
     }
 }
+
+const showColourSelector = ref(false);
+
+function onSetColour(colour: string) {
+    emit("setColour", colour);
+}
+
+const cssVariables = computed(() => {
+    const vars: Record<string, string> = {
+        "--font-size": `${props.annotation.data.size}rem`,
+    };
+
+    if (props.annotation.colour !== "none") {
+        vars["--font-colour"] = colours[props.annotation.colour as Colour];
+    }
+
+    return vars;
+});
 </script>
 
 <template>
@@ -148,9 +172,7 @@ async function onFocusOut() {
         <div
             ref="resizeContainer"
             class="resize-container prevent-zoom"
-            :style="{
-                '--font-size': `${props.annotation.data.size}rem`,
-            }"
+            :style="cssVariables"
             @click="onRootClick"
             @mouseup="onMouseUp">
             <DraggablePan
@@ -191,7 +213,12 @@ async function onFocusOut() {
                 @click="toggleItalic">
                 I
             </BButton>
-            <BButton class="button prevent-zoom" variant="primary" title="colour">
+            <BButton
+                class="button prevent-zoom"
+                variant="outline-primary"
+                title="colour"
+                :pressed="showColourSelector"
+                @click="() => (showColourSelector = !showColourSelector)">
                 <FontAwesomeIcon icon="fa-palette" />
             </BButton>
             <BButton class="button prevent-zoom" variant="primary" title="decrease font size" @click="decreaseFontSize">
@@ -204,6 +231,12 @@ async function onFocusOut() {
                 <FontAwesomeIcon icon="far fa-trash-alt" />
             </BButton>
         </BButtonGroup>
+
+        <ColourSelector
+            v-if="showColourSelector"
+            class="colour-selector"
+            :colour="props.annotation.colour"
+            @setColour="onSetColour" />
     </div>
 </template>
 
@@ -217,6 +250,10 @@ async function onFocusOut() {
 
     &:focus-within {
         .style-buttons {
+            visibility: visible;
+        }
+
+        .colour-selector {
             visibility: visible;
         }
 
@@ -242,8 +279,9 @@ async function onFocusOut() {
 
 .resize-container {
     --font-size: 1rem;
+    --font-colour: #{$brand-primary};
 
-    color: $brand-primary;
+    color: var(--font-colour);
     font-size: var(--font-size);
 
     width: 100%;
@@ -294,5 +332,11 @@ async function onFocusOut() {
         resize: both;
         border-color: $brand-primary;
     }
+}
+
+.colour-selector {
+    visibility: hidden;
+    right: 0.75rem;
+    top: -4.5rem;
 }
 </style>

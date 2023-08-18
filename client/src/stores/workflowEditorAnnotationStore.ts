@@ -4,7 +4,7 @@ import { computed, del, ref, set } from "vue";
 import { assertDefined } from "@/utils/assertions";
 import { hasKeys, match } from "@/utils/utils";
 
-type WorkflowAnnotationColour = "none" | "red" | "green" | "blue" | "orange" | "pink";
+type WorkflowAnnotationColour = string;
 
 export interface BaseWorkflowAnnotation {
     id: number;

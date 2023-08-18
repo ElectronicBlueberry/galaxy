@@ -45,6 +45,10 @@ function onMove(position: [number, number]) {
 function onRemove() {
     annotationStore.deleteAnnotation(props.annotation.id);
 }
+
+function onSetColour(colour: string) {
+    annotationStore.changeColour(props.annotation.id, colour);
+}
 </script>
 
 <template>
@@ -59,7 +63,8 @@ function onRemove() {
             @resize="onResize"
             @move="onMove"
             @panBy="(p) => emit('pan-by', p)"
-            @remove="onRemove" />
+            @remove="onRemove"
+            @setColour="onSetColour" />
         <MarkdownAnnotation v-else-if="props.annotation.type === 'markdown'" :annotation="props.annotation" />
         <GroupAnnotation v-else-if="props.annotation.type === 'group'" :annotation="props.annotation" />
         <FreehandAnnotation v-else-if="props.annotation.type === 'freehand'" :annotation="props.annotation" />
