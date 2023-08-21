@@ -87,21 +87,29 @@ function toggleItalic() {
     }
 }
 
-function increaseFontSize() {
-    const size = props.annotation.data.size;
+const fontSize = computed(() => props.annotation.data.size);
+const canIncreaseFontSize = computed(() => fontSize.value < 5);
+const canDecreaseFontSize = computed(() => fontSize.value > 1);
 
-    if (size < 5) {
-        emit("change", { ...props.annotation.data, size: size + 1 });
+function increaseFontSize() {
+    if (canIncreaseFontSize.value) {
+        emit("change", { ...props.annotation.data, size: fontSize.value + 1 });
     }
 }
+
+const increaseFontSizeTitle = computed(() =>
+    canIncreaseFontSize.value ? `Increase font size to ${fontSize.value + 1}` : "Maximum font size"
+);
 
 function decreaseFontSize() {
-    const size = props.annotation.data.size;
-
-    if (size > 1) {
-        emit("change", { ...props.annotation.data, size: size - 1 });
+    if (canDecreaseFontSize.value) {
+        emit("change", { ...props.annotation.data, size: fontSize.value - 1 });
     }
 }
+
+const decreaseFontSizeTitle = computed(() =>
+    canDecreaseFontSize.value ? `Decrease font size to ${fontSize.value - 1}` : "Minimum font size"
+);
 
 function onRootClick() {
     editableElement.value?.focus();
@@ -155,7 +163,7 @@ function onSetColour(colour: string) {
 
 const cssVariables = computed(() => {
     const vars: Record<string, string> = {
-        "--font-size": `${props.annotation.data.size}rem`,
+        "--font-size": `${fontSize.value}rem`,
     };
 
     if (props.annotation.colour !== "none") {
@@ -200,7 +208,7 @@ const cssVariables = computed(() => {
             <BButton
                 class="button font-weight-bold prevent-zoom"
                 variant="outline-primary"
-                title="bold"
+                :title="props.annotation.data.bold ? 'Reset bold' : 'Make bold'"
                 :pressed="props.annotation.data.bold"
                 @click="toggleBold">
                 B
@@ -208,7 +216,7 @@ const cssVariables = computed(() => {
             <BButton
                 class="button font-italic prevent-zoom"
                 variant="outline-primary"
-                title="italic"
+                :title="props.annotation.data.italic ? 'Reset italic' : 'Make italic'"
                 :pressed="props.annotation.data.italic"
                 @click="toggleItalic">
                 I
@@ -216,18 +224,26 @@ const cssVariables = computed(() => {
             <BButton
                 class="button prevent-zoom"
                 variant="outline-primary"
-                title="colour"
+                title="Colour"
                 :pressed="showColourSelector"
                 @click="() => (showColourSelector = !showColourSelector)">
                 <FontAwesomeIcon icon="fa-palette" />
             </BButton>
-            <BButton class="button prevent-zoom" variant="primary" title="decrease font size" @click="decreaseFontSize">
-                a
+            <BButton
+                class="button prevent-zoom"
+                variant="primary"
+                :title="decreaseFontSizeTitle"
+                @click="decreaseFontSize">
+                <FontAwesomeIcon :icon="['gxd', 'textSmaller']" />
             </BButton>
-            <BButton class="button prevent-zoom" variant="primary" title="increase font size" @click="increaseFontSize">
-                A
+            <BButton
+                class="button prevent-zoom"
+                variant="primary"
+                :title="increaseFontSizeTitle"
+                @click="increaseFontSize">
+                <FontAwesomeIcon :icon="['gxd', 'textLarger']" />
             </BButton>
-            <BButton class="button prevent-zoom" variant="dark" title="delete annotation" @click="() => emit('remove')">
+            <BButton class="button prevent-zoom" variant="dark" title="Delete annotation" @click="() => emit('remove')">
                 <FontAwesomeIcon icon="far fa-trash-alt" />
             </BButton>
         </BButtonGroup>
