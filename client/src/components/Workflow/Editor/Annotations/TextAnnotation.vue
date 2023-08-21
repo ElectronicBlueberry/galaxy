@@ -179,11 +179,13 @@ const cssVariables = computed(() => {
         <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions vuejs-accessibility/click-events-have-key-events -->
         <div
             ref="resizeContainer"
-            class="resize-container prevent-zoom"
+            class="resize-container"
+            :class="{ resizable: !props.readonly, 'prevent-zoom': !props.readonly }"
             :style="cssVariables"
             @click="onRootClick"
             @mouseup="onMouseUp">
             <DraggablePan
+                v-if="!props.readonly"
                 :root-offset="reactive(props.rootOffset)"
                 :scale="props.scale"
                 class="draggable-pan"
@@ -192,8 +194,8 @@ const cssVariables = computed(() => {
                 @pan-by="(p) => emit('panBy', p)" />
             <span
                 ref="editableElement"
+                :contenteditable="!props.readonly"
                 class="prevent-zoom"
-                contenteditable
                 spellcheck="false"
                 :class="{
                     bold: props.annotation.data.bold,
@@ -204,7 +206,7 @@ const cssVariables = computed(() => {
                 v-html="escapeAndSanitize(props.annotation.data.text)" />
         </div>
 
-        <BButtonGroup class="style-buttons">
+        <BButtonGroup v-if="!props.readonly" class="style-buttons">
             <BButton
                 class="button font-weight-bold prevent-zoom"
                 variant="outline-primary"
@@ -343,8 +345,8 @@ const cssVariables = computed(() => {
         top: 0;
     }
 
-    &:focus-within,
-    &:focus {
+    &.resizable:focus-within,
+    &.resizable:focus {
         resize: both;
         border-color: $brand-primary;
     }
