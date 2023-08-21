@@ -4,11 +4,11 @@ export const colours = {
     black: "#000",
     blue: "#004cec",
     turquoise: "#00bbd9",
-    green: "#008b0e",
+    green: "#319400",
     lime: "#68c000",
-    orange: "#eb6b00",
-    yellow: "#d9b600",
-    red: "#d70012",
+    orange: "#f48400",
+    yellow: "#fdbd0b",
+    red: "#e31920",
     pink: "#fb00a6",
 } as const;
 
@@ -25,21 +25,3 @@ export const brightColours = (() => {
     });
     return brighter as Record<Colour, string>;
 })();
-
-/*
-export const coloursAsCssVars = (() => {
-    const cssVars: Record<string, string> = {};
-    Object.entries(colours).forEach(([name, colour]) => {
-        cssVars[`--colour-${name}`] = colour;
-    });
-    return cssVars as Record<`--colour-${Colour}`, string>;
-})();
-
-export const brightColoursAsCssVars = (() => {
-    const cssVars: Record<string, string> = {};
-    Object.entries(brightColours).forEach(([name, colour]) => {
-        cssVars[`--colour-${name}-bright`] = colour;
-    });
-    return cssVars as Record<`--colour-${Colour}-bright`, string>;
-})();
-*/
