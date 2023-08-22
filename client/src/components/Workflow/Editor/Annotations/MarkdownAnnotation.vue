@@ -160,6 +160,9 @@ const cssVariables = computed(() => {
 <style scoped lang="scss">
 @import "theme/blue.scss";
 
+$gap-x: 0.8rem;
+$gap-y: 0.5rem;
+
 .markdown-workflow-annotation {
     width: 100%;
     height: 100%;
@@ -178,8 +181,8 @@ const cssVariables = computed(() => {
         }
 
         .markdown-textarea {
-            width: calc(100% - 0.5rem);
-            height: calc(100% - 0.2rem);
+            width: calc(100% - $gap-x - $gap-x);
+            height: calc(100% - $gap-y - $gap-y);
         }
     }
 
@@ -199,8 +202,8 @@ const cssVariables = computed(() => {
         resize: none;
 
         position: absolute;
-        top: 0.1rem;
-        left: 0.25rem;
+        top: $gap-y;
+        left: $gap-x;
 
         line-height: 1.2;
 
@@ -230,13 +233,13 @@ const cssVariables = computed(() => {
 
 .rendered-markdown {
     position: absolute;
-    top: 0.1rem;
-    left: 0.25rem;
+    top: $gap-y;
+    left: $gap-x;
     overflow-y: scroll;
     line-height: 1.2;
 
-    width: calc(100% - 0.5rem);
-    max-height: calc(100% - 0.2rem);
+    width: calc(100% - $gap-x - $gap-x);
+    max-height: calc(100% - $gap-y - $gap-y);
 
     &:deep(h1),
     &:deep(h2),
