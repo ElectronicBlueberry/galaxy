@@ -6,12 +6,13 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { UseElementBoundingReturn } from "@vueuse/core";
 import { BButton, BButtonGroup } from "bootstrap-vue";
 import { sanitize } from "dompurify";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref } from "vue";
 
 import type { TextWorkflowAnnotation } from "@/stores/workflowEditorAnnotationStore";
 import { wait } from "@/utils/utils";
 
 import { type Colour, colours } from "./colours";
+import { useResizable } from "./useResizable";
 
 import ColourSelector from "./ColourSelector.vue";
 import DraggablePan from "@/components/Workflow/Editor/DraggablePan.vue";
@@ -34,25 +35,22 @@ const emit = defineEmits<{
     (e: "setColour", colour: string): void;
 }>();
 
-// override user resize if size changes externally
-watch(
-    () => props.annotation.size,
-    ([width, height]) => {
-        const element = resizeContainer.value;
+const resizeContainer = ref<HTMLDivElement>();
 
-        if (element) {
-            element.style.width = `${width}px`;
-            element.style.height = `${height}px`;
-        }
+useResizable(
+    resizeContainer,
+    computed(() => props.annotation.size),
+    ([width, height]) => {
+        emit("resize", [width, height]);
+        saveText();
     }
 );
-
-const editableElement = ref<HTMLSpanElement>();
-const resizeContainer = ref<HTMLDivElement>();
 
 function escapeAndSanitize(text: string) {
     return sanitize(text, { ALLOWED_TAGS: ["br"] }).replace(/(?:^(\s|&nbsp;)+)|(?:(\s|&nbsp;)+$)/g, "");
 }
+
+const editableElement = ref<HTMLSpanElement>();
 
 function getInnerText() {
     const element = editableElement.value;
@@ -115,19 +113,6 @@ function onRootClick() {
     editableElement.value?.focus();
 }
 
-function onMouseUp(_event: MouseEvent) {
-    const element = resizeContainer.value;
-
-    if (element) {
-        const width = element.offsetWidth;
-        const height = element.offsetHeight;
-
-        emit("resize", [width, height]);
-    }
-
-    saveText();
-}
-
 function onMove(position: { x: number; y: number }) {
     emit("move", [position.x, position.y]);
 }
@@ -182,8 +167,7 @@ const cssVariables = computed(() => {
             class="resize-container"
             :class="{ resizable: !props.readonly, 'prevent-zoom': !props.readonly }"
             :style="cssVariables"
-            @click="onRootClick"
-            @mouseup="onMouseUp">
+            @click="onRootClick">
             <DraggablePan
                 v-if="!props.readonly"
                 :root-offset="reactive(props.rootOffset)"
