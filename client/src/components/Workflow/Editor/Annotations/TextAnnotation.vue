@@ -8,10 +8,10 @@ import { BButton, BButtonGroup } from "bootstrap-vue";
 import { sanitize } from "dompurify";
 import { computed, reactive, ref } from "vue";
 
-import type { TextWorkflowAnnotation } from "@/stores/workflowEditorAnnotationStore";
-import { wait } from "@/utils/utils";
+import type { TextWorkflowAnnotation, WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
 
-import { type Colour, colours } from "./colours";
+import { colours } from "./colours";
+import { useFocusWithin } from "./useFocusWithin";
 import { useResizable } from "./useResizable";
 
 import ColourSelector from "./ColourSelector.vue";
@@ -32,7 +32,7 @@ const emit = defineEmits<{
     (e: "move", position: [number, number]): void;
     (e: "panBy", position: { x: number; y: number }): void;
     (e: "remove"): void;
-    (e: "setColour", colour: string): void;
+    (e: "setColour", colour: WorkflowAnnotationColour): void;
 }>();
 
 const resizeContainer = ref<HTMLDivElement>();
@@ -117,32 +117,20 @@ function onMove(position: { x: number; y: number }) {
     emit("move", [position.x, position.y]);
 }
 
-let hasFocus = false;
-
-function onFocusIn() {
-    hasFocus = true;
-}
-
-async function onFocusOut() {
-    hasFocus = false;
-
-    // wait for end of event-loop
-    await wait(0);
-
-    if (!hasFocus) {
-        showColourSelector.value = false;
-
-        if (getInnerText() === "") {
-            emit("remove");
-        } else {
-            saveText();
-        }
-    }
-}
-
 const showColourSelector = ref(false);
+const rootElement = ref<HTMLDivElement>();
 
-function onSetColour(colour: string) {
+useFocusWithin(rootElement, null, () => {
+    showColourSelector.value = false;
+
+    if (getInnerText() === "") {
+        emit("remove");
+    } else {
+        saveText();
+    }
+});
+
+function onSetColour(colour: WorkflowAnnotationColour) {
     emit("setColour", colour);
 }
 
@@ -152,7 +140,7 @@ const cssVariables = computed(() => {
     };
 
     if (props.annotation.colour !== "none") {
-        vars["--font-colour"] = colours[props.annotation.colour as Colour];
+        vars["--font-colour"] = colours[props.annotation.colour];
     }
 
     return vars;
@@ -160,7 +148,7 @@ const cssVariables = computed(() => {
 </script>
 
 <template>
-    <div class="text-workflow-annotation" @focusout="onFocusOut" @focusin="onFocusIn">
+    <div ref="rootElement" class="text-workflow-annotation">
         <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions vuejs-accessibility/click-events-have-key-events -->
         <div
             ref="resizeContainer"

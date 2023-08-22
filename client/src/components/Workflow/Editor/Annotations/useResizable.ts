@@ -31,7 +31,7 @@ export function useResizable(
     let prevWidth = sizeControl.value[0];
     let prevHeight = sizeControl.value[1];
 
-    useEventListener("mouseup", () => {
+    useEventListener(target, "mouseup", () => {
         const element = target.value;
 
         if (element) {

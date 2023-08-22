@@ -3,7 +3,7 @@ import type { UseElementBoundingReturn } from "@vueuse/core";
 import { computed } from "vue";
 
 import { useWorkflowStores } from "@/composables/workflowStores";
-import type { WorkflowAnnotation } from "@/stores/workflowEditorAnnotationStore";
+import type { WorkflowAnnotation, WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
 
 import FreehandAnnotation from "./FreehandAnnotation.vue";
 import GroupAnnotation from "./GroupAnnotation.vue";
@@ -46,7 +46,7 @@ function onRemove() {
     annotationStore.deleteAnnotation(props.annotation.id);
 }
 
-function onSetColour(colour: string) {
+function onSetColour(colour: WorkflowAnnotationColour) {
     annotationStore.changeColour(props.annotation.id, colour);
 }
 </script>
@@ -65,7 +65,18 @@ function onSetColour(colour: string) {
             @panBy="(p) => emit('pan-by', p)"
             @remove="onRemove"
             @setColour="onSetColour" />
-        <MarkdownAnnotation v-else-if="props.annotation.type === 'markdown'" :annotation="props.annotation" />
+        <MarkdownAnnotation
+            v-else-if="props.annotation.type === 'markdown'"
+            :annotation="props.annotation"
+            :scale="props.scale"
+            :readonly="props.readonly"
+            :root-offset="props.rootOffset"
+            @change="onUpdateData"
+            @resize="onResize"
+            @move="onMove"
+            @panBy="(p) => emit('pan-by', p)"
+            @remove="onRemove"
+            @setColour="onSetColour" />
         <GroupAnnotation v-else-if="props.annotation.type === 'group'" :annotation="props.annotation" />
         <FreehandAnnotation v-else-if="props.annotation.type === 'freehand'" :annotation="props.annotation" />
     </div>

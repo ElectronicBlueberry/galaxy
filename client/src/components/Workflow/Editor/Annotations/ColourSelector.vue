@@ -1,15 +1,17 @@
 <script setup lang="ts">
+import type { WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
+
 import { brightColours, colours } from "./colours";
 
 const props = defineProps<{
-    colour: string;
+    colour: WorkflowAnnotationColour;
 }>();
 
 const emit = defineEmits<{
-    (e: "setColour", colour: string): void;
+    (e: "setColour", colour: WorkflowAnnotationColour): void;
 }>();
 
-function onClickColour(colour: string) {
+function onClickColour(colour: WorkflowAnnotationColour) {
     emit("setColour", colour);
 }
 </script>
@@ -53,7 +55,7 @@ function onClickColour(colour: string) {
 
     .colour-button {
         --colour: #{$brand-primary};
-        --colour-bright: #{$brand-light};
+        --colour-bright: #{$brand-secondary};
 
         background-color: var(--colour);
         border-color: var(--colour-bright);

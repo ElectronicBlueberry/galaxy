@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
 import { computed, del, ref, set } from "vue";
 
+import { Colour } from "@/components/Workflow/Editor/Annotations/colours";
 import { assertDefined } from "@/utils/assertions";
 import { hasKeys, match } from "@/utils/utils";
 
-type WorkflowAnnotationColour = string;
+export type WorkflowAnnotationColour = Colour | "none";
 
 export interface BaseWorkflowAnnotation {
     id: number;
