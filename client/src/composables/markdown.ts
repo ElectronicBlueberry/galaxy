@@ -1,36 +1,50 @@
 import MarkdownIt from "markdown-it";
 import { readonly } from "vue";
 
-const mdEngine = MarkdownIt();
-
 /**
  * Adds a rule to open all links in a new page.
  * https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
  */
-function addRuleOpenLinksInNewPage(engine) {
-    var defaultRender =
+function addRuleOpenLinksInNewPage(engine: MarkdownIt) {
+    const defaultRender =
         engine.renderer.rules.link_open ||
-        function (tokens, idx, options, env, self) {
+        function (tokens, idx, options, _env, self) {
             return self.renderToken(tokens, idx, options);
         };
+
     engine.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-        var aIndex = tokens[idx].attrIndex("target");
-        if (aIndex < 0) {
-            tokens[idx].attrPush(["target", "_blank"]);
-        } else {
-            tokens[idx].attrs[aIndex][1] = "_blank";
+        const token = tokens[idx];
+
+        if (token) {
+            const aIndex = token.attrIndex("target");
+
+            if (aIndex && aIndex < 0) {
+                token.attrPush(["target", "_blank"]);
+            } else {
+                token.attrs![aIndex]![1] = "_blank";
+            }
         }
+
         return defaultRender(tokens, idx, options, env, self);
     };
 }
 
+interface UseMarkdownOptions {
+    openLinksInNewPage?: boolean;
+}
+
+type RawMarkdown = string;
+type HTMLString = string;
+
 /** Composable for rendering Markdown strings.  */
-export function useMarkdown(options = {}) {
+export function useMarkdown(options: UseMarkdownOptions = {}) {
+    const mdEngine = MarkdownIt();
+
     if (options.openLinksInNewPage) {
         addRuleOpenLinksInNewPage(mdEngine);
     }
 
-    function renderMarkdown(markdown) {
+    function renderMarkdown(markdown: RawMarkdown): HTMLString {
         return mdEngine.render(markdown);
     }
 
