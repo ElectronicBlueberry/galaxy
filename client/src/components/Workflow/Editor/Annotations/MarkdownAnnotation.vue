@@ -68,7 +68,7 @@ const content = computed(() => {
 const markdownTextarea = ref<HTMLTextAreaElement>();
 
 function onClick() {
-    if (window.getSelection()?.toString() === "") {
+    if (!props.readonly && window.getSelection()?.toString() === "") {
         markdownTextarea.value?.focus();
     }
 }
