@@ -71,5 +71,6 @@ function id(connection: Connection) {
     top: 0;
     position: absolute;
     transform-origin: 0 0;
+    z-index: 80;
 }
 </style>

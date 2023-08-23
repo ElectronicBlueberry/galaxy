@@ -11,7 +11,7 @@ import { useMarkdown } from "@/composables/markdown";
 import { useUid } from "@/composables/utils/uid";
 import type { MarkdownWorkflowAnnotation, WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
 
-import { brighterColours, darkenedColours } from "./colours";
+import { darkenedColours } from "./colours";
 import { useFocusWithin } from "./useFocusWithin";
 import { useResizable } from "./useResizable";
 
@@ -101,7 +101,6 @@ const cssVariables = computed(() => {
 
     if (props.annotation.colour !== "none") {
         vars["--primary-colour"] = darkenedColours[props.annotation.colour];
-        vars["--secondary-colour"] = brighterColours[props.annotation.colour];
     }
 
     return vars;
@@ -263,10 +262,9 @@ $gap-y: 0.5rem;
 
 .resize-container {
     --primary-colour: #{$brand-primary};
-    --secondary-colour: #{$white};
 
     color: var(--primary-colour);
-    background-color: var(--secondary-colour);
+    background-color: $white;
 
     .markdown-textarea {
         color: var(--primary-colour);
