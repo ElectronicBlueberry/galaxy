@@ -20,22 +20,20 @@ function onClickColour(colour: WorkflowAnnotationColour) {
     <div class="annotation-colour-selector">
         <button
             class="colour-button prevent-zoom"
+            title="No Colour"
             :class="{ selected: props.colour === 'none' }"
-            @click="() => onClickColour('none')">
-            <span class="sr-only">none</span>
-        </button>
+            @click="() => onClickColour('none')"></button>
         <button
             v-for="(hex, name) in colours"
             :key="name"
             class="colour-button prevent-zoom"
+            :title="`Colour ${name}`"
             :class="{ selected: props.colour === name }"
             :style="{
                 '--colour': hex,
                 '--colour-bright': brightColours[name],
             }"
-            @click="() => onClickColour(name)">
-            <span class="sr-only">{{ name }}</span>
-        </button>
+            @click="() => onClickColour(name)"></button>
     </div>
 </template>
 
