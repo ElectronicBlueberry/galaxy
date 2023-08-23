@@ -14,7 +14,7 @@ def attach_ordered_steps(workflow):
     """Attempt to topologically order steps and attach to workflow. If this
     fails - the workflow contains cycles so it mark it as such.
     """
-    ordered_steps = order_workflow_steps(workflow.steps)
+    ordered_steps = order_workflow_steps(workflow.steps, workflow.annotations)
     workflow.has_cycles = True
     if ordered_steps:
         workflow.has_cycles = False
@@ -24,7 +24,7 @@ def attach_ordered_steps(workflow):
     return workflow.has_cycles
 
 
-def order_workflow_steps(steps):
+def order_workflow_steps(steps, annotations):
     """
     Perform topological sort of the steps, return ordered or None
     """
@@ -45,6 +45,9 @@ def order_workflow_steps(steps):
                 "top": step.position["top"] - min_top
                 # other position attributes can be discarded if present
             }
+        if annotations:
+            for annotation in annotations:
+                annotation.position = [annotation.position[0] - min_left, annotation.position[1] - min_top]
         steps.sort(key=lambda _: _.position["left"] + _.position["top"])
         # order by Euclidean distance to the origin (i.e. pre-normalized (min_left, min_top))
         steps.sort(key=lambda _: math.sqrt(_.position["left"] ** 2 + _.position["top"] ** 2))

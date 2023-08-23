@@ -796,10 +796,6 @@ class WorkflowContentsManager(UsesAnnotations):
 
         workflow.has_cycles = True
         workflow.steps = steps
-        # we can't reorder subworkflows, as step connections would become invalid
-        if not is_subworkflow:
-            # Order the steps if possible
-            attach_ordered_steps(workflow)
 
         annotations: List[model.WorkflowAnnotation] = []
         for annotation_dict in data.get("annotations", []):
@@ -807,6 +803,11 @@ class WorkflowContentsManager(UsesAnnotations):
             annotations.append(annotation)
 
         workflow.annotations = annotations
+
+        # we can't reorder subworkflows, as step connections would become invalid
+        if not is_subworkflow:
+            # Order the steps if possible
+            attach_ordered_steps(workflow)
 
         return workflow, missing_tool_tups
 
