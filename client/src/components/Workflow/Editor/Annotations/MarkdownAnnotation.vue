@@ -3,16 +3,15 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import { faPalette } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import type { UseElementBoundingReturn } from "@vueuse/core";
+import { type UseElementBoundingReturn, useFocusWithin } from "@vueuse/core";
 import { BButton, BButtonGroup } from "bootstrap-vue";
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 import { useMarkdown } from "@/composables/markdown";
 import { useUid } from "@/composables/utils/uid";
 import type { MarkdownWorkflowAnnotation, WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
 
 import { darkenedColours } from "./colours";
-import { useFocusWithin } from "./useFocusWithin";
 import { useResizable } from "./useResizable";
 
 import ColourSelector from "./ColourSelector.vue";
@@ -80,9 +79,16 @@ function onMove(position: { x: number; y: number }) {
 const showColourSelector = ref(false);
 const rootElement = ref<HTMLDivElement>();
 
-const { focusWithin } = useFocusWithin(rootElement, null, () => {
-    showColourSelector.value = false;
-});
+const { focused } = useFocusWithin(rootElement);
+
+watch(
+    () => focused.value,
+    () => {
+        if (!focused.value) {
+            showColourSelector.value = false;
+        }
+    }
+);
 
 function onSetColour(colour: WorkflowAnnotationColour) {
     emit("setColour", colour);
@@ -131,7 +137,7 @@ const cssVariables = computed(() => {
                 @input="onTextChange"></textarea>
 
             <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions vuejs-accessibility/click-events-have-key-events -->
-            <div v-if="!focusWithin" class="rendered-markdown" @click="onClick" v-html="content"></div>
+            <div v-if="!focused" class="rendered-markdown" @click="onClick" v-html="content"></div>
         </div>
 
         <BButtonGroup v-if="!props.readonly" class="style-buttons">

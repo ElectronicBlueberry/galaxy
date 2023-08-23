@@ -77,7 +77,18 @@ function onSetColour(colour: WorkflowAnnotationColour) {
             @panBy="(p) => emit('pan-by', p)"
             @remove="onRemove"
             @setColour="onSetColour" />
-        <GroupAnnotation v-else-if="props.annotation.type === 'group'" :annotation="props.annotation" />
+        <GroupAnnotation
+            v-else-if="props.annotation.type === 'group'"
+            :annotation="props.annotation"
+            :scale="props.scale"
+            :readonly="props.readonly"
+            :root-offset="props.rootOffset"
+            @change="onUpdateData"
+            @resize="onResize"
+            @move="onMove"
+            @panBy="(p) => emit('pan-by', p)"
+            @remove="onRemove"
+            @setColour="onSetColour" />
         <FreehandAnnotation v-else-if="props.annotation.type === 'freehand'" :annotation="props.annotation" />
     </div>
 </template>
@@ -89,10 +100,5 @@ function onSetColour(colour: WorkflowAnnotationColour) {
     height: var(--height);
     top: var(--position-top);
     left: var(--position-left);
-
-    &:deep(.workflow-draggable) {
-        width: 100%;
-        height: 100%;
-    }
 }
 </style>

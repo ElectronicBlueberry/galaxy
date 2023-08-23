@@ -3,15 +3,14 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import { faPalette } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import type { UseElementBoundingReturn } from "@vueuse/core";
+import { type UseElementBoundingReturn, useFocusWithin } from "@vueuse/core";
 import { BButton, BButtonGroup } from "bootstrap-vue";
 import { sanitize } from "dompurify";
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 import type { TextWorkflowAnnotation, WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
 
 import { colours } from "./colours";
-import { useFocusWithin } from "./useFocusWithin";
 import { useResizable } from "./useResizable";
 
 import ColourSelector from "./ColourSelector.vue";
@@ -120,15 +119,22 @@ function onMove(position: { x: number; y: number }) {
 const showColourSelector = ref(false);
 const rootElement = ref<HTMLDivElement>();
 
-useFocusWithin(rootElement, null, () => {
-    showColourSelector.value = false;
+const { focused } = useFocusWithin(rootElement);
 
-    if (getInnerText() === "") {
-        emit("remove");
-    } else {
-        saveText();
+watch(
+    () => focused.value,
+    () => {
+        if (!focused.value) {
+            showColourSelector.value = false;
+
+            if (getInnerText() === "") {
+                emit("remove");
+            } else {
+                saveText();
+            }
+        }
     }
-});
+);
 
 function onSetColour(colour: WorkflowAnnotationColour) {
     emit("setColour", colour);
