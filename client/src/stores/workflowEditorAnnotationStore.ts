@@ -33,7 +33,9 @@ export interface MarkdownWorkflowAnnotation extends BaseWorkflowAnnotation {
 
 export interface GroupWorkflowAnnotation extends BaseWorkflowAnnotation {
     type: "group";
-    data: string;
+    data: {
+        title: string;
+    };
 }
 
 export interface FreehandWorkflowAnnotation extends BaseWorkflowAnnotation {
@@ -77,8 +79,14 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
         };
 
         const annotations = computed(() => Object.values(annotationsRecord.value));
-        const addAnnotations = (annotationsArray: WorkflowAnnotation[]) => {
-            annotationsArray.forEach((annotation) => set(annotationsRecord.value, annotation.id, annotation));
+        const addAnnotations = (annotationsArray: WorkflowAnnotation[], defaultPosition: [number, number] = [0, 0]) => {
+            annotationsArray.forEach((annotation) => {
+                const newAnnotation = structuredClone(annotation);
+                newAnnotation.position[0] += defaultPosition[0];
+                newAnnotation.position[1] += defaultPosition[1];
+
+                set(annotationsRecord.value, newAnnotation.id, newAnnotation);
+            });
         };
 
         const getAnnotation = (id: number) => {

@@ -67,7 +67,7 @@ export async function fromSimple(
 
     // Do not load annotations in append mode
     if (!appendData) {
-        annotationStore.addAnnotations(data.annotations);
+        annotationStore.addAnnotations(data.annotations, [defaultPosition.left, defaultPosition.top]);
     }
 }
 
