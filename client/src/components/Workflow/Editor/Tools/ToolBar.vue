@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faMagnet } from "@fortawesome/free-solid-svg-icons";
+import { faMarkdown } from "@fortawesome/free-brands-svg-icons";
+import { faMagnet, faMousePointer, faObjectGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { BButton } from "bootstrap-vue";
+import { BButton, BButtonGroup } from "bootstrap-vue";
 import { computed, toRefs } from "vue";
 
-import { useWorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
+import { type AnnotationTool, useWorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
 
-library.add(faMagnet);
+library.add(faMagnet, faMousePointer, faObjectGroup, faMarkdown);
 
-const { snapActive } = toRefs(useWorkflowEditorToolbarStore());
+const { snapActive, currentTool } = toRefs(useWorkflowEditorToolbarStore());
 
 const snapButtonTitle = computed(() => {
     if (snapActive.value) {
@@ -18,13 +19,66 @@ const snapButtonTitle = computed(() => {
         return "Activate magnet snapping";
     }
 });
+
+function onClickPointer() {
+    currentTool.value = "pointer";
+}
+
+function onAnnotationToolClick(annotation: AnnotationTool) {
+    currentTool.value = annotation;
+}
 </script>
 
 <template>
     <div class="workflow-editor-toolbar">
-        <BButton class="button" :title="snapButtonTitle" :pressed.sync="snapActive" variant="outline-primary">
-            <FontAwesomeIcon icon="fa-magnet" />
-        </BButton>
+        <BButtonGroup vertical>
+            <BButton
+                v-b-tooltip.hover.right
+                class="button"
+                title="Pointer Tool"
+                :pressed="currentTool === 'pointer'"
+                variant="outline-primary"
+                @click="onClickPointer">
+                <FontAwesomeIcon icon="fa-mouse-pointer" size="lg" />
+            </BButton>
+            <BButton
+                v-b-tooltip.hover.right
+                class="button"
+                :title="snapButtonTitle"
+                :pressed.sync="snapActive"
+                variant="outline-primary">
+                <FontAwesomeIcon icon="fa-magnet" size="lg" />
+            </BButton>
+        </BButtonGroup>
+        <BButtonGroup vertical>
+            <BButton
+                v-b-tooltip.hover.right
+                class="button"
+                title="Add text annotation"
+                :pressed="currentTool === 'textAnnotation'"
+                variant="outline-primary"
+                @click="() => onAnnotationToolClick('textAnnotation')">
+                T
+            </BButton>
+            <BButton
+                v-b-tooltip.hover.right
+                class="button"
+                title="Add markdown annotation"
+                :pressed="currentTool === 'markdownAnnotation'"
+                variant="outline-primary"
+                @click="() => onAnnotationToolClick('markdownAnnotation')">
+                <FontAwesomeIcon :icon="['fab', 'markdown']" size="lg" />
+            </BButton>
+            <BButton
+                v-b-tooltip.hover.right
+                class="button"
+                title="Add group annotation"
+                :pressed="currentTool === 'groupAnnotation'"
+                variant="outline-primary"
+                @click="() => onAnnotationToolClick('groupAnnotation')">
+                <FontAwesomeIcon icon="fa-object-group" size="lg" />
+            </BButton>
+        </BButtonGroup>
     </div>
 </template>
 
