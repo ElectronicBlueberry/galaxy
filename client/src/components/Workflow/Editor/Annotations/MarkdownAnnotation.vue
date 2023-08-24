@@ -164,13 +164,16 @@ const cssVariables = computed(() => {
 
 <style scoped lang="scss">
 @import "theme/blue.scss";
+@import "buttonGroup.scss";
 
 $gap-x: 0.8rem;
 $gap-y: 0.5rem;
 
 .markdown-workflow-annotation {
+    position: absolute;
     width: 100%;
     height: 100%;
+    z-index: 50;
 
     &:focus-within {
         .resize-container {
@@ -224,15 +227,7 @@ $gap-y: 0.5rem;
 
     .style-buttons {
         visibility: hidden;
-        position: absolute;
-        top: -2rem;
-        right: 0;
-
-        .button {
-            padding: 0;
-            height: 1.5rem;
-            width: 1.5rem;
-        }
+        @include button-group-style;
     }
 }
 

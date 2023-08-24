@@ -99,9 +99,14 @@ export class AxisAlignedBoundingBox implements Rectangle {
         }
     }
 
-    /** check if other bounding box fits into this one */
-    contains(other: AxisAlignedBoundingBox) {
-        return this.x <= other.x && this.y <= other.y && this.endX >= other.endX && this.endY >= other.endY;
+    /** check if other rectangle fits into this one */
+    contains(other: Rectangle) {
+        return (
+            this.x <= other.x &&
+            this.y <= other.y &&
+            this.endX >= other.x + other.width &&
+            this.endY >= other.y + other.height
+        );
     }
 }
 

@@ -238,6 +238,7 @@ const cssVariables = computed(() => {
 
 <style scoped lang="scss">
 @import "theme/blue.scss";
+@import "buttonGroup.scss";
 
 .text-workflow-annotation {
     position: absolute;
@@ -262,15 +263,7 @@ const cssVariables = computed(() => {
 
     .style-buttons {
         visibility: hidden;
-        position: absolute;
-        top: -2rem;
-        right: 0;
-
-        .button {
-            padding: 0;
-            height: 1.5rem;
-            width: 1.5rem;
-        }
+        @include button-group-style;
     }
 }
 

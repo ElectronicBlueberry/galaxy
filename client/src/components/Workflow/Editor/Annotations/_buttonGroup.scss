@@ -1,0 +1,11 @@
+@mixin button-group-style {
+    position: absolute;
+    top: -2rem;
+    right: 0;
+
+    .button {
+        padding: 0;
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+}
