@@ -1,6 +1,8 @@
 import { useEventListener } from "@vueuse/core";
 import { type Ref, watch } from "vue";
 
+import { snapDistance, useWorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
+
 /**
  * Common functionality required for handling a user resizable element.
  * `resize: both` needs to be set on the elements style, this composable
@@ -31,14 +33,20 @@ export function useResizable(
     let prevWidth = sizeControl.value[0];
     let prevHeight = sizeControl.value[1];
 
+    const toolbarStore = useWorkflowEditorToolbarStore();
     useEventListener(target, "mouseup", () => {
         const element = target.value;
 
         if (element) {
-            const width = element.offsetWidth;
-            const height = element.offsetHeight;
+            let width = element.offsetWidth;
+            let height = element.offsetHeight;
 
             if (prevWidth !== width || prevHeight !== height) {
+                if (toolbarStore.snapActive) {
+                    width = Math.round(width / snapDistance) * snapDistance;
+                    height = Math.round(height / snapDistance) * snapDistance;
+                }
+
                 onResized([width, height]);
 
                 prevWidth = width;

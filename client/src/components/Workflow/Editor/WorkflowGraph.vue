@@ -1,6 +1,7 @@
 <template>
     <div id="workflow-canvas" class="unified-panel-body workflow-canvas">
         <ZoomControl :zoom-level="scale" :pan="transform" @onZoom="onZoom" @update:pan="panBy" />
+        <ToolBar v-if="!readonly" />
         <div id="canvas-container" ref="canvas" class="canvas-content" @drop.prevent @dragover.prevent>
             <AdaptiveGrid
                 :viewport-bounds="elementBounding"
@@ -69,6 +70,7 @@ import { maxZoom, minZoom } from "./modules/zoomLevels";
 import AdaptiveGrid from "./AdaptiveGrid.vue";
 import WorkflowAnnotation from "./Annotations/WorkflowAnnotation.vue";
 import WorkflowNode from "@/components/Workflow/Editor/Node.vue";
+import ToolBar from "@/components/Workflow/Editor/ToolBar/ToolBar.vue";
 import WorkflowEdges from "@/components/Workflow/Editor/WorkflowEdges.vue";
 import WorkflowMinimap from "@/components/Workflow/Editor/WorkflowMinimap.vue";
 import ZoomControl from "@/components/Workflow/Editor/ZoomControl.vue";
