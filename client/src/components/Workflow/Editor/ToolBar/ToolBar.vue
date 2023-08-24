@@ -3,18 +3,26 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faMagnet } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { BButton } from "bootstrap-vue";
-import { toRefs } from "vue";
+import { computed, toRefs } from "vue";
 
 import { useWorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
 
 library.add(faMagnet);
 
 const { snapActive } = toRefs(useWorkflowEditorToolbarStore());
+
+const snapButtonTitle = computed(() => {
+    if (snapActive.value) {
+        return "Deactivate magnet snapping";
+    } else {
+        return "Activate magnet snapping";
+    }
+});
 </script>
 
 <template>
     <div class="workflow-editor-toolbar">
-        <BButton class="button" :pressed.sync="snapActive" variant="outline-primary">
+        <BButton class="button" :title="snapButtonTitle" :pressed.sync="snapActive" variant="outline-primary">
             <FontAwesomeIcon icon="fa-magnet" />
         </BButton>
     </div>
