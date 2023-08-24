@@ -70,7 +70,7 @@ import { maxZoom, minZoom } from "./modules/zoomLevels";
 import AdaptiveGrid from "./AdaptiveGrid.vue";
 import WorkflowAnnotation from "./Annotations/WorkflowAnnotation.vue";
 import WorkflowNode from "@/components/Workflow/Editor/Node.vue";
-import ToolBar from "@/components/Workflow/Editor/ToolBar/ToolBar.vue";
+import ToolBar from "@/components/Workflow/Editor/Tools/ToolBar.vue";
 import WorkflowEdges from "@/components/Workflow/Editor/WorkflowEdges.vue";
 import WorkflowMinimap from "@/components/Workflow/Editor/WorkflowMinimap.vue";
 import ZoomControl from "@/components/Workflow/Editor/ZoomControl.vue";
