@@ -29,12 +29,13 @@ export async function fromSimple(
     const stepStore = useWorkflowStepStore(id);
     const annotationStore = useWorkflowAnnotationStore(id);
 
-    const stepIdOffset = stepStore.getStepIndex + 1;
+    // If workflow being copied into another, wipe UUID and let
+    // Galaxy assign new ones.
+    if (appendData) {
+        const stepIdOffset = stepStore.getStepIndex + 1;
+        const annotationsIdOffset = annotationStore.annotations.length;
 
-    Object.values(data.steps).forEach((step) => {
-        // If workflow being copied into another, wipe UUID and let
-        // Galaxy assign new ones.
-        if (appendData) {
+        Object.values(data.steps).forEach((step) => {
             delete step.uuid;
             if (!step.position) {
                 // Should only happen for manually authored editor content,
@@ -59,16 +60,18 @@ export async function fromSimple(
                     });
                 }
             });
-        }
-    });
-    Object.values(data.steps).map((step) => {
+        });
+
+        data.annotations.forEach((annotation) => {
+            annotation.id += annotationsIdOffset;
+        });
+    }
+
+    Object.values(data.steps).forEach((step) => {
         stepStore.addStep(step);
     });
 
-    // Do not load annotations in append mode
-    if (!appendData) {
-        annotationStore.addAnnotations(data.annotations, [defaultPosition.left, defaultPosition.top]);
-    }
+    annotationStore.addAnnotations(data.annotations, [defaultPosition.left, defaultPosition.top]);
 }
 
 export function toSimple(workflow: Workflow) {

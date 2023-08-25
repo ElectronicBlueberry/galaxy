@@ -59,7 +59,7 @@ function assertAnnotationDataValid(
     const valid = match(annotationType, {
         text: () => hasKeys(annotationData, ["text", "size"]),
         markdown: () => typeof annotationData === "string",
-        group: () => typeof annotationData === "string",
+        group: () => hasKeys(annotationData, ["title"]),
         freehand: () => hasKeys(annotationData, ["thickness", "line"]),
     });
 
