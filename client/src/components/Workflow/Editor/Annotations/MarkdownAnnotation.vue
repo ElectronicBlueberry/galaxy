@@ -30,9 +30,9 @@ const emit = defineEmits<{
     (e: "change", data: MarkdownWorkflowAnnotation["data"]): void;
     (e: "resize", size: [number, number]): void;
     (e: "move", position: [number, number]): void;
-    (e: "panBy", position: { x: number; y: number }): void;
+    (e: "pan-by", position: { x: number; y: number }): void;
     (e: "remove"): void;
-    (e: "setColour", colour: WorkflowAnnotationColour): void;
+    (e: "set-colour", colour: WorkflowAnnotationColour): void;
 }>();
 
 const resizeContainer = ref<HTMLDivElement>();
@@ -91,7 +91,7 @@ watch(
 );
 
 function onSetColour(colour: WorkflowAnnotationColour) {
-    emit("setColour", colour);
+    emit("set-colour", colour);
 }
 
 function onTextChange() {
@@ -126,7 +126,7 @@ const cssVariables = computed(() => {
                 :scale="props.scale"
                 class="draggable-pan"
                 @move="onMove"
-                @pan-by="(p) => emit('panBy', p)" />
+                @pan-by="(p) => emit('pan-by', p)" />
 
             <label :for="textAreaId" class="sr-only">Markdown Input</label>
             <textarea
@@ -158,7 +158,7 @@ const cssVariables = computed(() => {
             v-if="showColourSelector"
             class="colour-selector"
             :colour="props.annotation.colour"
-            @setColour="onSetColour" />
+            @set-colour="onSetColour" />
     </div>
 </template>
 

@@ -53,7 +53,7 @@ function onAnnotationToolClick(annotation: AnnotationTool) {
         <BButtonGroup vertical>
             <BButton
                 v-b-tooltip.hover.right
-                class="button"
+                class="button font-weight-bold"
                 title="Add text annotation"
                 :pressed="currentTool === 'textAnnotation'"
                 variant="outline-primary"

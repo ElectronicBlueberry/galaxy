@@ -8,11 +8,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: "setColour", colour: WorkflowAnnotationColour): void;
+    (e: "set-colour", colour: WorkflowAnnotationColour): void;
 }>();
 
 function onClickColour(colour: WorkflowAnnotationColour) {
-    emit("setColour", colour);
+    emit("set-colour", colour);
 }
 </script>
 

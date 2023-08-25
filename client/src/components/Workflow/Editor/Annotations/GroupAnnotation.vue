@@ -36,9 +36,9 @@ const emit = defineEmits<{
     (e: "change", data: GroupWorkflowAnnotation["data"]): void;
     (e: "resize", size: [number, number]): void;
     (e: "move", position: [number, number]): void;
-    (e: "panBy", position: { x: number; y: number }): void;
+    (e: "pan-by", position: { x: number; y: number }): void;
     (e: "remove"): void;
-    (e: "setColour", colour: WorkflowAnnotationColour): void;
+    (e: "set-colour", colour: WorkflowAnnotationColour): void;
 }>();
 
 const resizeContainer = ref<HTMLDivElement>();
@@ -91,7 +91,7 @@ function onClick() {
 }
 
 function onSetColour(colour: WorkflowAnnotationColour) {
-    emit("setColour", colour);
+    emit("set-colour", colour);
 }
 
 const { stateStore, stepStore, annotationStore } = useWorkflowStores();
@@ -219,7 +219,7 @@ const cssVariables = computed(() => {
                 @move="onMove"
                 @mouseup="onDragEnd"
                 @start="onDragStart"
-                @pan-by="(p) => emit('panBy', p)" />
+                @pan-by="(p) => emit('pan-by', p)" />
 
             <div class="group-annotation-header">
                 <FontAwesomeIcon icon="fas fa-object-group" />
@@ -254,7 +254,7 @@ const cssVariables = computed(() => {
             v-if="showColourSelector"
             class="colour-selector"
             :colour="props.annotation.colour"
-            @setColour="onSetColour" />
+            @set-colour="onSetColour" />
     </div>
 </template>
 

@@ -29,9 +29,9 @@ const emit = defineEmits<{
     (e: "change", data: TextWorkflowAnnotation["data"]): void;
     (e: "resize", size: [number, number]): void;
     (e: "move", position: [number, number]): void;
-    (e: "panBy", position: { x: number; y: number }): void;
+    (e: "pan-by", position: { x: number; y: number }): void;
     (e: "remove"): void;
-    (e: "setColour", colour: WorkflowAnnotationColour): void;
+    (e: "set-colour", colour: WorkflowAnnotationColour): void;
 }>();
 
 const resizeContainer = ref<HTMLDivElement>();
@@ -137,7 +137,7 @@ watch(
 );
 
 function onSetColour(colour: WorkflowAnnotationColour) {
-    emit("setColour", colour);
+    emit("set-colour", colour);
 }
 
 const cssVariables = computed(() => {
@@ -169,7 +169,7 @@ const cssVariables = computed(() => {
                 class="draggable-pan"
                 @move="onMove"
                 @mouseup="saveText"
-                @pan-by="(p) => emit('panBy', p)" />
+                @pan-by="(p) => emit('pan-by', p)" />
             <span
                 ref="editableElement"
                 :contenteditable="!props.readonly"
@@ -232,7 +232,7 @@ const cssVariables = computed(() => {
             v-if="showColourSelector"
             class="colour-selector"
             :colour="props.annotation.colour"
-            @setColour="onSetColour" />
+            @set-colour="onSetColour" />
     </div>
 </template>
 
