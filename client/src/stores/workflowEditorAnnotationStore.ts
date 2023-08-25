@@ -14,6 +14,7 @@ export interface BaseWorkflowAnnotation {
     position: [number, number];
     size: [number, number];
     data: unknown;
+    userCreated?: true;
 }
 
 export interface TextWorkflowAnnotation extends BaseWorkflowAnnotation {
@@ -70,6 +71,8 @@ function assertAnnotationDataValid(
     }
 }
 
+export type WorkflowAnnotationStore = ReturnType<typeof useWorkflowAnnotationStore>;
+
 export const useWorkflowAnnotationStore = (workflowId: string) => {
     return defineStore(`workflowAnnotationStore${workflowId}`, () => {
         const annotationsRecord = ref<Record<string, WorkflowAnnotation>>({});
@@ -120,6 +123,16 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             del(annotationsRecord.value, id);
         };
 
+        /**
+         * Adds a single annotation. Sets the `userCreated` flag.
+         * Meant to be used when a user adds an annotation.
+         * @param annotation
+         */
+        const createAnnotation = (annotation: BaseWorkflowAnnotation) => {
+            annotation.userCreated = true;
+            addAnnotations([annotation as WorkflowAnnotation]);
+        };
+
         return {
             annotations,
             annotationsRecord,
@@ -130,6 +143,7 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             changeData,
             changeColour,
             deleteAnnotation,
+            createAnnotation,
             $reset,
         };
     })();

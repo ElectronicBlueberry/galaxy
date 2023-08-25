@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { type UseElementBoundingReturn, useFocusWithin } from "@vueuse/core";
 import { BButton, BButtonGroup } from "bootstrap-vue";
 import { sanitize } from "dompurify";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 
 import { AxisAlignedBoundingBox, type Rectangle } from "@/components/Workflow/Editor/modules/geometry";
 import { useWorkflowStores } from "@/composables/workflowStores";
@@ -19,6 +19,7 @@ import type { Step } from "@/stores/workflowStepStore";
 
 import { brighterColours, darkenedColours } from "./colours";
 import { useResizable } from "./useResizable";
+import { selectAllText } from "./utilities";
 
 import ColourSelector from "./ColourSelector.vue";
 import DraggablePan from "@/components/Workflow/Editor/DraggablePan.vue";
@@ -199,6 +200,12 @@ const cssVariables = computed(() => {
     }
 
     return vars;
+});
+
+onMounted(() => {
+    if (props.annotation.userCreated && editableElement.value) {
+        selectAllText(editableElement.value);
+    }
 });
 </script>
 

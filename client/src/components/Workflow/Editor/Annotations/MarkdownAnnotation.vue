@@ -5,7 +5,7 @@ import { faPalette } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { type UseElementBoundingReturn, useFocusWithin } from "@vueuse/core";
 import { BButton, BButtonGroup } from "bootstrap-vue";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 
 import { useMarkdown } from "@/composables/markdown";
 import { useUid } from "@/composables/utils/uid";
@@ -13,6 +13,7 @@ import type { MarkdownWorkflowAnnotation, WorkflowAnnotationColour } from "@/sto
 
 import { darkenedColours } from "./colours";
 import { useResizable } from "./useResizable";
+import { selectAllText } from "./utilities";
 
 import ColourSelector from "./ColourSelector.vue";
 import DraggablePan from "@/components/Workflow/Editor/DraggablePan.vue";
@@ -76,6 +77,14 @@ function onMove(position: { x: number; y: number }) {
     emit("move", [position.x, position.y]);
 }
 
+function onMouseup() {
+    const element = markdownTextarea.value;
+
+    if (element && element.value.trim() === "") {
+        element.focus();
+    }
+}
+
 const showColourSelector = ref(false);
 const rootElement = ref<HTMLDivElement>();
 
@@ -111,6 +120,12 @@ const cssVariables = computed(() => {
 
     return vars;
 });
+
+onMounted(() => {
+    if (props.annotation.userCreated && markdownTextarea.value) {
+        selectAllText(markdownTextarea.value);
+    }
+});
 </script>
 
 <template>
@@ -125,6 +140,7 @@ const cssVariables = computed(() => {
                 :root-offset="reactive(props.rootOffset)"
                 :scale="props.scale"
                 class="draggable-pan"
+                @mouseup="onMouseup"
                 @move="onMove"
                 @pan-by="(p) => emit('pan-by', p)" />
 
@@ -168,6 +184,9 @@ const cssVariables = computed(() => {
 
 $gap-x: 0.8rem;
 $gap-y: 0.5rem;
+
+$min-width: 1.5em;
+$min-height: 1.5em;
 
 .markdown-workflow-annotation {
     position: absolute;
@@ -241,6 +260,9 @@ $gap-y: 0.5rem;
     width: calc(100% - $gap-x - $gap-x);
     max-height: calc(100% - $gap-y - $gap-y);
 
+    min-width: $min-width;
+    min-height: $min-height;
+
     &:deep(h1),
     &:deep(h2),
     &:deep(h3),
@@ -273,6 +295,8 @@ $gap-y: 0.5rem;
 
     width: 100%;
     height: 100%;
+    min-width: calc($min-width + $gap-x + $gap-x);
+    min-height: calc($min-height + $gap-y + $gap-y);
     position: relative;
     overflow: hidden;
 

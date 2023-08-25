@@ -6,7 +6,8 @@ import { computed, inject, PropType, reactive, ref } from "vue";
 
 import { useAnimationFrameSize } from "@/composables/sensors/animationFrameSize";
 import { useAnimationFrameThrottle } from "@/composables/throttle";
-import { snapDistance, useWorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
+import { useWorkflowStores } from "@/composables/workflowStores";
+import { snapDistance } from "@/stores/workflowEditorToolbarStore";
 
 import { useDraggable } from "./composables/useDraggable.js";
 
@@ -69,7 +70,8 @@ const onStart = (_position: Position, event: DragEvent) => {
     }
 };
 
-const { snapActive } = storeToRefs(useWorkflowEditorToolbarStore());
+const { toolbarStore } = useWorkflowStores();
+const { snapActive } = storeToRefs(toolbarStore);
 
 function getSnappedPosition<T extends Position>(position: T) {
     if (snapActive.value) {

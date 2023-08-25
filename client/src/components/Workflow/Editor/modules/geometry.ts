@@ -210,3 +210,19 @@ export class Transform {
         return this.matrix[3];
     }
 }
+
+export function vecMin(a: Vector, b: Vector): Vector {
+    return [Math.min(a[0], b[0]), Math.min(a[1], b[1])];
+}
+
+export function vecMax(a: Vector, b: Vector): Vector {
+    return [Math.max(a[0], b[0]), Math.max(a[1], b[1])];
+}
+
+export function vecSnap(a: Vector, snap: number): Vector {
+    return [Math.round(a[0] / snap) * snap, Math.round(a[1] / snap) * snap];
+}
+
+export function vecSubtract(a: Vector, b: Vector): Vector {
+    return [a[0] - b[0], a[1] - b[1]];
+}
