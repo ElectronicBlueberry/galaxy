@@ -191,7 +191,7 @@ function renderMinimap() {
 
     // draw rects
 
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 2 / canvasTransform.scaleX;
     groupAnnotations.forEach((annotation) => {
         ctx.beginPath();
 
@@ -223,7 +223,7 @@ function renderMinimap() {
         ctx.stroke();
     });
 
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1 / canvasTransform.scaleX;
     textAnnotations.forEach((annotation) => {
         ctx.beginPath();
 
