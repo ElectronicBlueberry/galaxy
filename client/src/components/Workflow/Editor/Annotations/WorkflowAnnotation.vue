@@ -42,6 +42,10 @@ function onMove(position: [number, number]) {
     annotationStore.changePosition(props.annotation.id, position);
 }
 
+function onPan(position: { x: number; y: number }) {
+    emit("pan-by", position);
+}
+
 function onRemove() {
     annotationStore.deleteAnnotation(props.annotation.id);
 }
@@ -62,7 +66,7 @@ function onSetColour(colour: WorkflowAnnotationColour) {
             @change="onUpdateData"
             @resize="onResize"
             @move="onMove"
-            @pan-by="(p) => emit('pan-by', p)"
+            @pan-by="onPan"
             @remove="onRemove"
             @set-colour="onSetColour" />
         <MarkdownAnnotation
@@ -74,7 +78,7 @@ function onSetColour(colour: WorkflowAnnotationColour) {
             @change="onUpdateData"
             @resize="onResize"
             @move="onMove"
-            @pan-by="(p) => emit('pan-by', p)"
+            @pan-by="onPan"
             @remove="onRemove"
             @set-colour="onSetColour" />
         <GroupAnnotation
@@ -86,7 +90,7 @@ function onSetColour(colour: WorkflowAnnotationColour) {
             @change="onUpdateData"
             @resize="onResize"
             @move="onMove"
-            @pan-by="(p) => emit('pan-by', p)"
+            @pan-by="onPan"
             @remove="onRemove"
             @set-colour="onSetColour" />
         <FreehandAnnotation v-else-if="props.annotation.type === 'freehand'" :annotation="props.annotation" />

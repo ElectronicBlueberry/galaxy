@@ -6,12 +6,20 @@ import { computed, onMounted, ref, unref, watch } from "vue";
 import { useAnimationFrame } from "@/composables/sensors/animationFrame";
 import { useAnimationFrameThrottle } from "@/composables/throttle";
 import { useWorkflowStores } from "@/composables/workflowStores";
+import type {
+    GroupWorkflowAnnotation,
+    MarkdownWorkflowAnnotation,
+    TextWorkflowAnnotation,
+    WorkflowAnnotation,
+} from "@/stores/workflowEditorAnnotationStore";
 import type { Step, Steps } from "@/stores/workflowStepStore";
 
+import * as annotationColours from "./Annotations/colours";
 import { AxisAlignedBoundingBox, Transform } from "./modules/geometry";
 
 const props = defineProps<{
     steps: Steps;
+    annotations: WorkflowAnnotation[];
     viewportBounds: UseElementBoundingReturn;
     viewportBoundingBox: AxisAlignedBoundingBox;
 }>();
@@ -60,6 +68,15 @@ function recalculateAABB() {
         }
     });
 
+    props.annotations.forEach((annotation) => {
+        aabb.fitRectangle({
+            x: annotation.position[0],
+            y: annotation.position[1],
+            width: annotation.size[0],
+            height: annotation.size[1],
+        });
+    });
+
     aabb.squareCenter();
     aabb.expand(120);
 
@@ -70,9 +87,9 @@ function recalculateAABB() {
     }
 }
 
-// redraw if any steps change
+// redraw if any steps or annotations change
 watch(
-    props.steps,
+    () => [props.steps, props.annotations],
     () => {
         redraw = true;
         aabbChanged = true;
@@ -140,6 +157,20 @@ function renderMinimap() {
     // apply global to local transform
     canvasTransform.applyToContext(ctx);
 
+    const groupAnnotations: GroupWorkflowAnnotation[] = [];
+    const markdownAnnotations: MarkdownWorkflowAnnotation[] = [];
+    const textAnnotations: TextWorkflowAnnotation[] = [];
+
+    props.annotations.forEach((annotation) => {
+        if (annotation.type === "group") {
+            groupAnnotations.push(annotation);
+        } else if (annotation.type === "markdown") {
+            markdownAnnotations.push(annotation);
+        } else if (annotation.type === "text") {
+            textAnnotations.push(annotation);
+        }
+    });
+
     const allSteps = Object.values(props.steps);
     const okSteps: Step[] = [];
     const errorSteps: Step[] = [];
@@ -159,6 +190,53 @@ function renderMinimap() {
     });
 
     // draw rects
+
+    ctx.lineWidth = 4;
+    groupAnnotations.forEach((annotation) => {
+        ctx.beginPath();
+
+        if (annotation.colour !== "none") {
+            ctx.fillStyle = annotationColours.brighterColours[annotation.colour];
+            ctx.strokeStyle = annotationColours.colours[annotation.colour];
+        } else {
+            ctx.fillStyle = "rgba(0, 0, 0, 0)";
+            ctx.strokeStyle = colors.node;
+        }
+
+        ctx.rect(annotation.position[0], annotation.position[1], annotation.size[0], annotation.size[1]);
+        ctx.fill();
+        ctx.stroke();
+    });
+
+    ctx.fillStyle = "white";
+    markdownAnnotations.forEach((annotation) => {
+        ctx.beginPath();
+
+        if (annotation.colour !== "none") {
+            ctx.strokeStyle = annotationColours.colours[annotation.colour];
+        } else {
+            ctx.strokeStyle = colors.node;
+        }
+
+        ctx.rect(annotation.position[0], annotation.position[1], annotation.size[0], annotation.size[1]);
+        ctx.fill();
+        ctx.stroke();
+    });
+
+    ctx.lineWidth = 2;
+    textAnnotations.forEach((annotation) => {
+        ctx.beginPath();
+
+        if (annotation.colour !== "none") {
+            ctx.strokeStyle = annotationColours.brightColours[annotation.colour];
+        } else {
+            ctx.strokeStyle = colors.node;
+        }
+
+        ctx.rect(annotation.position[0], annotation.position[1], annotation.size[0], annotation.size[1]);
+        ctx.stroke();
+    });
+
     ctx.beginPath();
     ctx.fillStyle = colors.node;
     okSteps.forEach((step) => {
