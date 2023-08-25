@@ -38,16 +38,21 @@ def order_workflow_steps(steps, annotations):
         # find minimum left and top values to normalize position
         min_left = min(step.position["left"] for step in steps)
         min_top = min(step.position["top"] for step in steps)
-        # normalize by min_left and min_top
+        if annotations:
+            min_left_annotations = min(annotation.position[0] for annotation in annotations)
+            min_top_annotations = min(annotation.position[1] for annotation in annotations)
+            min_left = min(min_left_annotations, min_left)
+            min_top = min(min_top_annotations, min_top)
+            # normalize by min_left and min_top
+            for annotation in annotations:
+                annotation.position = [annotation.position[0] - min_left, annotation.position[1] - min_top]
+        # normalize steps
         for step in steps:
             step.position = {
                 "left": step.position["left"] - min_left,
                 "top": step.position["top"] - min_top
                 # other position attributes can be discarded if present
             }
-        if annotations:
-            for annotation in annotations:
-                annotation.position = [annotation.position[0] - min_left, annotation.position[1] - min_top]
         steps.sort(key=lambda _: _.position["left"] + _.position["top"])
         # order by Euclidean distance to the origin (i.e. pre-normalized (min_left, min_top))
         steps.sort(key=lambda _: math.sqrt(_.position["left"] ** 2 + _.position["top"] ** 2))
