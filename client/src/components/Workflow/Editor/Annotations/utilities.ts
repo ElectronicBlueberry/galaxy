@@ -5,7 +5,7 @@ export function selectAllText(element: HTMLElement) {
         element.select();
     } else {
         const range = document.createRange();
-        range.selectNode(element);
+        range.selectNodeContents(element);
         window.getSelection()?.removeAllRanges();
         window.getSelection()?.addRange(range);
     }
