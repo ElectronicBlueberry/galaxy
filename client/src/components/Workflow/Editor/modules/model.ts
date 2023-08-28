@@ -33,7 +33,6 @@ export async function fromSimple(
     // Galaxy assign new ones.
     if (appendData) {
         const stepIdOffset = stepStore.getStepIndex + 1;
-        const annotationsIdOffset = annotationStore.annotations.length;
 
         Object.values(data.steps).forEach((step) => {
             delete step.uuid;
@@ -62,8 +61,8 @@ export async function fromSimple(
             });
         });
 
-        data.annotations.forEach((annotation) => {
-            annotation.id += annotationsIdOffset;
+        data.annotations.forEach((annotation, index) => {
+            annotation.id = annotationStore.highestAnnotationId + 1 + index;
         });
     }
 
