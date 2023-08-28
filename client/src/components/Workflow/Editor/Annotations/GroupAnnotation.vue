@@ -250,10 +250,10 @@ onMounted(() => {
                 title="Colour"
                 :pressed="showColourSelector"
                 @click="() => (showColourSelector = !showColourSelector)">
-                <FontAwesomeIcon icon="fa-palette" />
+                <FontAwesomeIcon icon="fa-palette" class="prevent-zoom" />
             </BButton>
             <BButton class="button prevent-zoom" variant="dark" title="Delete annotation" @click="() => emit('remove')">
-                <FontAwesomeIcon icon="far fa-trash-alt" />
+                <FontAwesomeIcon icon="far fa-trash-alt" class="prevent-zoom" />
             </BButton>
         </BButtonGroup>
 

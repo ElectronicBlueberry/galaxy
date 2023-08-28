@@ -214,24 +214,24 @@ onMounted(() => {
                 title="Colour"
                 :pressed="showColourSelector"
                 @click="() => (showColourSelector = !showColourSelector)">
-                <FontAwesomeIcon icon="fa-palette" />
+                <FontAwesomeIcon icon="fa-palette" class="prevent-zoom" />
             </BButton>
             <BButton
                 class="button prevent-zoom"
                 variant="primary"
                 :title="decreaseFontSizeTitle"
                 @click="decreaseFontSize">
-                <FontAwesomeIcon :icon="['gxd', 'textSmaller']" />
+                <FontAwesomeIcon :icon="['gxd', 'textSmaller']" class="prevent-zoom" />
             </BButton>
             <BButton
                 class="button prevent-zoom"
                 variant="primary"
                 :title="increaseFontSizeTitle"
                 @click="increaseFontSize">
-                <FontAwesomeIcon :icon="['gxd', 'textLarger']" />
+                <FontAwesomeIcon :icon="['gxd', 'textLarger']" class="prevent-zoom" />
             </BButton>
             <BButton class="button prevent-zoom" variant="dark" title="Delete annotation" @click="() => emit('remove')">
-                <FontAwesomeIcon icon="far fa-trash-alt" />
+                <FontAwesomeIcon icon="far fa-trash-alt" class="prevent-zoom" />
             </BButton>
         </BButtonGroup>
 
