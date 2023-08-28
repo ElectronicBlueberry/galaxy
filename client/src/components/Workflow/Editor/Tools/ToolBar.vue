@@ -269,6 +269,16 @@ useToolLogic(toolbarStore, annotationStore);
                 height: 2rem;
                 padding: 0 0.5rem;
             }
+
+            &:deep(.btn-outline-primary) {
+                &:not(.active) {
+                    background-color: $workflow-editor-bg;
+                }
+
+                &:hover {
+                    background-color: $brand-primary;
+                }
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ const textAreaId = useUid("textarea-");
 const { renderMarkdown } = useMarkdown({ openLinksInNewPage: true, increaseHeadingLevelBy: 1 });
 
 const content = computed(() => {
-    const renderedMarkdown = renderMarkdown(props.annotation.data);
+    const renderedMarkdown = renderMarkdown(props.annotation.data.text);
 
     const node = document.createElement("div");
     node.innerHTML = renderedMarkdown;
@@ -107,7 +107,7 @@ function onTextChange() {
     const element = markdownTextarea.value;
 
     if (element) {
-        emit("change", element.value);
+        emit("change", { text: element.value });
     }
 }
 
@@ -149,7 +149,7 @@ onMounted(() => {
                 :id="textAreaId"
                 ref="markdownTextarea"
                 class="markdown-textarea prevent-zoom"
-                :value="props.annotation.data"
+                :value="props.annotation.data.text"
                 @input="onTextChange"></textarea>
 
             <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions vuejs-accessibility/click-events-have-key-events -->

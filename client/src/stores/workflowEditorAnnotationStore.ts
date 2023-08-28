@@ -29,7 +29,9 @@ export interface TextWorkflowAnnotation extends BaseWorkflowAnnotation {
 
 export interface MarkdownWorkflowAnnotation extends BaseWorkflowAnnotation {
     type: "markdown";
-    data: string;
+    data: {
+        text: string;
+    };
 }
 
 export interface GroupWorkflowAnnotation extends BaseWorkflowAnnotation {
@@ -59,7 +61,7 @@ function assertAnnotationDataValid(
 ): asserts annotationData is WorkflowAnnotation["data"] {
     const valid = match(annotationType, {
         text: () => hasKeys(annotationData, ["text", "size"]),
-        markdown: () => typeof annotationData === "string",
+        markdown: () => hasKeys(annotationData, ["string"]),
         group: () => hasKeys(annotationData, ["title"]),
         freehand: () => hasKeys(annotationData, ["thickness", "line"]),
     });
