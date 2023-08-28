@@ -48,7 +48,7 @@ useResizable(
 
 const textAreaId = useUid("textarea-");
 
-const { renderMarkdown } = useMarkdown({ openLinksInNewPage: true });
+const { renderMarkdown } = useMarkdown({ openLinksInNewPage: true, increaseHeadingLevelBy: 1 });
 
 const content = computed(() => {
     const renderedMarkdown = renderMarkdown(props.annotation.data);
@@ -263,13 +263,32 @@ $min-height: 1.5em;
     min-width: $min-width;
     min-height: $min-height;
 
-    &:deep(h1),
     &:deep(h2),
     &:deep(h3),
     &:deep(h4),
     &:deep(h5),
     &:deep(h6) {
         margin-bottom: 0.2em;
+    }
+
+    &:deep(h2) {
+        font-size: $h1-font-size;
+    }
+
+    &:deep(h3) {
+        font-size: $h2-font-size;
+    }
+
+    &:deep(h4) {
+        font-size: $h3-font-size;
+    }
+
+    &:deep(h5) {
+        font-size: $h4-font-size;
+    }
+
+    &:deep(h6) {
+        font-size: $h5-font-size;
     }
 
     &:deep(ul),
