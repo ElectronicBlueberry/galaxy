@@ -26,7 +26,7 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
 
         if (!annotation) {
             const baseAnnotation = {
-                id: annotationStore.annotations.length,
+                id: annotationStore.highestAnnotationId + 1,
                 position: start,
                 size: [0, 0] as [number, number],
                 colour: "none" as WorkflowAnnotationColour,

@@ -92,50 +92,53 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             });
         };
 
-        const getAnnotation = (id: number) => {
+        const highestAnnotationId = computed(() => annotations.value[annotations.value.length - 1]?.id ?? -1);
+
+        const getAnnotation = computed(() => (id: number) => {
             const annotation = annotationsRecord.value[id];
             assertDefined(annotation);
             return annotation;
-        };
+        });
 
-        const changePosition = (id: number, position: [number, number]) => {
-            const annotation = getAnnotation(id);
+        function changePosition(id: number, position: [number, number]) {
+            const annotation = getAnnotation.value(id);
             set(annotation, "position", position);
-        };
+        }
 
-        const changeSize = (id: number, size: [number, number]) => {
-            const annotation = getAnnotation(id);
+        function changeSize(id: number, size: [number, number]) {
+            const annotation = getAnnotation.value(id);
             set(annotation, "size", size);
-        };
+        }
 
-        const changeData = (id: number, data: unknown) => {
-            const annotation = getAnnotation(id);
+        function changeData(id: number, data: unknown) {
+            const annotation = getAnnotation.value(id);
             assertAnnotationDataValid(annotation.type, data);
             set(annotation, "data", data);
-        };
+        }
 
-        const changeColour = (id: number, colour: WorkflowAnnotationColour) => {
-            const annotation = getAnnotation(id);
+        function changeColour(id: number, colour: WorkflowAnnotationColour) {
+            const annotation = getAnnotation.value(id);
             set(annotation, "colour", colour);
-        };
+        }
 
-        const deleteAnnotation = (id: number) => {
+        function deleteAnnotation(id: number) {
             del(annotationsRecord.value, id);
-        };
+        }
 
         /**
          * Adds a single annotation. Sets the `userCreated` flag.
          * Meant to be used when a user adds an annotation.
          * @param annotation
          */
-        const createAnnotation = (annotation: BaseWorkflowAnnotation) => {
+        function createAnnotation(annotation: BaseWorkflowAnnotation) {
             annotation.userCreated = true;
             addAnnotations([annotation as WorkflowAnnotation]);
-        };
+        }
 
         return {
             annotations,
             annotationsRecord,
+            highestAnnotationId,
             addAnnotations,
             getAnnotation,
             changePosition,
