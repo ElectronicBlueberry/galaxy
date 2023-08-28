@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import { onScopeDispose, ref } from "vue";
+import { onScopeDispose, reactive, ref } from "vue";
 
 import { useUserLocalStorage } from "@/composables/userLocalStorage";
 
-export const snapDistance = 10;
+import type { WorkflowAnnotationColour } from "./workflowEditorAnnotationStore";
 
 export type AnnotationTool = "textAnnotation" | "markdownAnnotation" | "groupAnnotation";
 export type EditorTool = "pointer" | AnnotationTool;
@@ -27,6 +27,14 @@ export const useWorkflowEditorToolbarStore = (workflowId: string) => {
         const currentTool = ref<EditorTool>("pointer");
         const inputCatcherActive = ref<boolean>(false);
         const inputCatcherEventListeners = new Set<InputCatcherEventListener>();
+        const snapDistance = ref<10 | 20 | 50 | 100 | 200>(10);
+
+        const annotationOptions = reactive({
+            bold: false,
+            italic: false,
+            colour: "none" as WorkflowAnnotationColour,
+            textSize: 2,
+        });
 
         function onInputCatcherEvent(type: InputCatcherEventType, callback: InputCatcherEventListener["callback"]) {
             const listener = {
@@ -51,8 +59,10 @@ export const useWorkflowEditorToolbarStore = (workflowId: string) => {
 
         return {
             snapActive,
+            snapDistance,
             currentTool,
             inputCatcherActive,
+            annotationOptions,
             onInputCatcherEvent,
             emitInputCatcherEvent,
         };

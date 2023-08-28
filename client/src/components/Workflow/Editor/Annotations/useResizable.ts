@@ -2,7 +2,6 @@ import { useEventListener } from "@vueuse/core";
 import { type Ref, watch } from "vue";
 
 import { useWorkflowStores } from "@/composables/workflowStores";
-import { snapDistance } from "@/stores/workflowEditorToolbarStore";
 
 import { vecSnap } from "../modules/geometry";
 
@@ -46,7 +45,7 @@ export function useResizable(
 
             if (prevWidth !== width || prevHeight !== height) {
                 if (toolbarStore.snapActive) {
-                    onResized(vecSnap([width, height], snapDistance));
+                    onResized(vecSnap([width, height], toolbarStore.snapDistance));
                 } else {
                     onResized([width, height]);
                 }

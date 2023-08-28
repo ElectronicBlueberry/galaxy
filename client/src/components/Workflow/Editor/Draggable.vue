@@ -7,7 +7,6 @@ import { computed, inject, PropType, reactive, ref } from "vue";
 import { useAnimationFrameSize } from "@/composables/sensors/animationFrameSize";
 import { useAnimationFrameThrottle } from "@/composables/throttle";
 import { useWorkflowStores } from "@/composables/workflowStores";
-import { snapDistance } from "@/stores/workflowEditorToolbarStore";
 
 import { useDraggable } from "./composables/useDraggable.js";
 
@@ -77,8 +76,8 @@ function getSnappedPosition<T extends Position>(position: T) {
     if (snapActive.value) {
         return {
             ...position,
-            x: Math.round(position.x / snapDistance) * snapDistance,
-            y: Math.round(position.y / snapDistance) * snapDistance,
+            x: Math.round(position.x / toolbarStore.snapDistance) * toolbarStore.snapDistance,
+            y: Math.round(position.y / toolbarStore.snapDistance) * toolbarStore.snapDistance,
         } as T;
     } else {
         return {

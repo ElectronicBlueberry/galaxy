@@ -1,11 +1,7 @@
 import { watch } from "vue";
 
-import type {
-    BaseWorkflowAnnotation,
-    WorkflowAnnotationColour,
-    WorkflowAnnotationStore,
-} from "@/stores/workflowEditorAnnotationStore";
-import { snapDistance, type WorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
+import type { BaseWorkflowAnnotation, WorkflowAnnotationStore } from "@/stores/workflowEditorAnnotationStore";
+import { type WorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
 import { match } from "@/utils/utils";
 
 import { vecMax, vecMin, vecSnap, vecSubtract, type Vector } from "../modules/geometry";
@@ -13,6 +9,8 @@ import { vecMax, vecMin, vecSnap, vecSubtract, type Vector } from "../modules/ge
 export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotationStore: WorkflowAnnotationStore) {
     let annotation: BaseWorkflowAnnotation | null = null;
     let start: Vector | null = null;
+
+    const { annotationOptions } = toolbarStore;
 
     watch(
         () => toolbarStore.currentTool,
@@ -29,7 +27,7 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
                 id: annotationStore.highestAnnotationId + 1,
                 position: start,
                 size: [0, 0] as [number, number],
-                colour: "none" as WorkflowAnnotationColour,
+                colour: annotationOptions.colour,
             };
 
             annotation = match(toolbarStore.currentTool, {
@@ -37,8 +35,10 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
                     ...baseAnnotation,
                     type: "text",
                     data: {
-                        size: 2,
+                        size: annotationOptions.textSize,
                         text: "Enter Text",
+                        bold: annotationOptions.bold,
+                        italic: annotationOptions.italic,
                     } as BaseWorkflowAnnotation["data"],
                 }),
                 markdownAnnotation: () => ({
@@ -76,8 +76,8 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
 
     const positionAnnotation = (pointA: Vector, pointB: Vector, annotation: BaseWorkflowAnnotation) => {
         if (toolbarStore.snapActive) {
-            pointA = vecSnap(pointA, snapDistance);
-            pointB = vecSnap(pointB, snapDistance);
+            pointA = vecSnap(pointA, toolbarStore.snapDistance);
+            pointB = vecSnap(pointB, toolbarStore.snapDistance);
         }
 
         const pointMin = vecMin(pointA, pointB);
