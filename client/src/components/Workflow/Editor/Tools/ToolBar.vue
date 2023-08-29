@@ -336,7 +336,7 @@ whenever(ctrl_7!, () => (toolbarStore.currentTool = "freehandEraser"));
                 position: absolute;
                 top: 0.5rem;
                 bottom: 0.5rem;
-                width: 2px;
+                width: 0;
                 right: calc(-0.5rem - 1px);
                 align-self: stretch;
                 border: 1px solid $border-color;
