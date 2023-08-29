@@ -61,7 +61,7 @@ function assertAnnotationDataValid(
 ): asserts annotationData is WorkflowAnnotation["data"] {
     const valid = match(annotationType, {
         text: () => hasKeys(annotationData, ["text", "size"]),
-        markdown: () => hasKeys(annotationData, ["string"]),
+        markdown: () => hasKeys(annotationData, ["text"]),
         group: () => hasKeys(annotationData, ["title"]),
         freehand: () => hasKeys(annotationData, ["thickness", "line"]),
     });
