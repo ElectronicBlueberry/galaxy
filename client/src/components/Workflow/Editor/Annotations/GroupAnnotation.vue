@@ -191,6 +191,12 @@ function onMove(position: { x: number; y: number }) {
     emit("move", [position.x, position.y]);
 }
 
+function onDoubleClick() {
+    if (editableElement.value) {
+        selectAllText(editableElement.value);
+    }
+}
+
 const cssVariables = computed(() => {
     const vars: Record<string, string> = {};
 
@@ -238,6 +244,7 @@ onMounted(() => {
                     spellcheck="false"
                     @blur="saveText"
                     @keydown.enter.prevent="saveText"
+                    @dblclick.prevent="onDoubleClick"
                     @mouseup.stop
                     v-html="escapeAndSanitize(props.annotation.data.title)" />
             </div>

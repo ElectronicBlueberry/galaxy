@@ -156,6 +156,12 @@ const cssVariables = computed(() => {
 
 const { annotationStore } = useWorkflowStores();
 
+function onDoubleClick() {
+    if (editableElement.value) {
+        selectAllText(editableElement.value);
+    }
+}
+
 onMounted(() => {
     if (annotationStore.isJustCreated(props.annotation.id) && editableElement.value) {
         selectAllText(editableElement.value);
@@ -180,6 +186,7 @@ onMounted(() => {
                 @move="onMove"
                 @mouseup="saveText"
                 @pan-by="(p) => emit('pan-by', p)" />
+            <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
             <span
                 ref="editableElement"
                 :contenteditable="!props.readonly"
@@ -191,6 +198,7 @@ onMounted(() => {
                 }"
                 @blur="saveText"
                 @mouseup.stop
+                @dblclick.prevent="onDoubleClick"
                 v-html="escapeAndSanitize(props.annotation.data.text)" />
         </div>
 
