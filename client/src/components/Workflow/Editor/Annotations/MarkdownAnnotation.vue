@@ -9,6 +9,7 @@ import { computed, onMounted, reactive, ref, watch } from "vue";
 
 import { useMarkdown } from "@/composables/markdown";
 import { useUid } from "@/composables/utils/uid";
+import { useWorkflowStores } from "@/composables/workflowStores";
 import type { MarkdownWorkflowAnnotation, WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
 
 import { darkenedColours } from "./colours";
@@ -121,8 +122,10 @@ const cssVariables = computed(() => {
     return vars;
 });
 
+const { annotationStore } = useWorkflowStores();
+
 onMounted(() => {
-    if (props.annotation.userCreated && markdownTextarea.value) {
+    if (annotationStore.isJustCreated(props.annotation.id) && markdownTextarea.value) {
         selectAllText(markdownTextarea.value);
     }
 });

@@ -93,7 +93,10 @@ function onSetColour(colour: WorkflowAnnotationColour) {
             @pan-by="onPan"
             @remove="onRemove"
             @set-colour="onSetColour" />
-        <FreehandAnnotation v-else-if="props.annotation.type === 'freehand'" :annotation="props.annotation" />
+        <FreehandAnnotation
+            v-else-if="props.annotation.type === 'freehand'"
+            :annotation="props.annotation"
+            @remove="onRemove" />
     </div>
 </template>
 

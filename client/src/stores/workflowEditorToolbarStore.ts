@@ -1,13 +1,19 @@
+import { useMagicKeys } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { onScopeDispose, reactive, ref } from "vue";
+import { computed, onScopeDispose, reactive, ref, watch } from "vue";
 
 import { useUserLocalStorage } from "@/composables/userLocalStorage";
 
 import type { WorkflowAnnotationColour } from "./workflowEditorAnnotationStore";
 
-export type AnnotationTool = "textAnnotation" | "markdownAnnotation" | "groupAnnotation";
+export type AnnotationTool =
+    | "textAnnotation"
+    | "markdownAnnotation"
+    | "groupAnnotation"
+    | "freehandAnnotation"
+    | "freehandEraser";
 export type EditorTool = "pointer" | AnnotationTool;
-export type InputCatcherEventType = "pointerdown" | "pointerup" | "pointermove";
+export type InputCatcherEventType = "pointerdown" | "pointerup" | "pointermove" | "temporarilyDisabled";
 
 interface InputCatcherEventListener {
     type: InputCatcherEventType;
@@ -34,7 +40,11 @@ export const useWorkflowEditorToolbarStore = (workflowId: string) => {
             italic: false,
             colour: "none" as WorkflowAnnotationColour,
             textSize: 2,
+            lineThickness: 5,
+            smoothing: 2,
         });
+
+        const inputCatcherPressed = ref(false);
 
         function onInputCatcherEvent(type: InputCatcherEventType, callback: InputCatcherEventListener["callback"]) {
             const listener = {
@@ -49,6 +59,22 @@ export const useWorkflowEditorToolbarStore = (workflowId: string) => {
             });
         }
 
+        onInputCatcherEvent("pointerdown", () => (inputCatcherPressed.value = true));
+        onInputCatcherEvent("pointerup", () => (inputCatcherPressed.value = false));
+        onInputCatcherEvent("temporarilyDisabled", () => (inputCatcherPressed.value = false));
+
+        watch(
+            () => inputCatcherActive.value,
+            () => {
+                if (!inputCatcherActive.value) {
+                    inputCatcherPressed.value = false;
+                }
+            }
+        );
+
+        const { shift, space, alt, ctrl } = useMagicKeys();
+        const inputCatcherEnabled = computed(() => !(shift?.value || space?.value || alt?.value || ctrl?.value));
+
         function emitInputCatcherEvent(type: InputCatcherEventType, event: InputCatcherEvent) {
             inputCatcherEventListeners.forEach((listener) => {
                 if (listener.type === type) {
@@ -62,7 +88,9 @@ export const useWorkflowEditorToolbarStore = (workflowId: string) => {
             snapDistance,
             currentTool,
             inputCatcherActive,
+            inputCatcherEnabled,
             annotationOptions,
+            inputCatcherPressed,
             onInputCatcherEvent,
             emitInputCatcherEvent,
         };

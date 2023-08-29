@@ -8,6 +8,7 @@ import { BButton, BButtonGroup } from "bootstrap-vue";
 import { sanitize } from "dompurify";
 import { computed, onMounted, reactive, ref, watch } from "vue";
 
+import { useWorkflowStores } from "@/composables/workflowStores";
 import type { TextWorkflowAnnotation, WorkflowAnnotationColour } from "@/stores/workflowEditorAnnotationStore";
 
 import { colours } from "./colours";
@@ -153,8 +154,10 @@ const cssVariables = computed(() => {
     return vars;
 });
 
+const { annotationStore } = useWorkflowStores();
+
 onMounted(() => {
-    if (props.annotation.userCreated && editableElement.value) {
+    if (annotationStore.isJustCreated(props.annotation.id) && editableElement.value) {
         selectAllText(editableElement.value);
     }
 });

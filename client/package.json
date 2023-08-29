@@ -86,6 +86,7 @@
     "rxjs": "^7.5.2",
     "rxjs-spy": "^8.0.2",
     "rxjs-spy-devtools-plugin": "^0.0.4",
+    "simplify-js": "^1.2.4",
     "slugify": "^1.6.5",
     "snake-case": "^3.0.4",
     "splitpanes": "2.3.8",

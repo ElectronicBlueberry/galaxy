@@ -1,7 +1,9 @@
+import simplify from "simplify-js";
 import { watch } from "vue";
 
 import type { BaseWorkflowAnnotation, WorkflowAnnotationStore } from "@/stores/workflowEditorAnnotationStore";
 import { type WorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarStore";
+import { assertDefined } from "@/utils/assertions";
 import { match } from "@/utils/utils";
 
 import { vecMax, vecMin, vecSnap, vecSubtract, type Vector } from "../modules/geometry";
@@ -15,14 +17,22 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
     watch(
         () => toolbarStore.currentTool,
         () => {
-            annotation = null;
+            if (annotation?.type === "freehand") {
+                finalizeFreehandAnnotation(annotation);
+            } else {
+                annotation = null;
+            }
         }
     );
 
     toolbarStore.onInputCatcherEvent("pointerdown", ({ position }) => {
         start = position;
 
-        if (!annotation) {
+        if (toolbarStore.currentTool === "freehandEraser") {
+            return;
+        }
+
+        if (annotation?.type === "freehand" || !annotation) {
             const baseAnnotation = {
                 id: annotationStore.highestAnnotationId + 1,
                 position: start,
@@ -44,13 +54,23 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
                 markdownAnnotation: () => ({
                     ...baseAnnotation,
                     type: "markdown",
-                    data: "*Enter Text*",
+                    data: {
+                        text: "*Enter Text*",
+                    },
                 }),
                 groupAnnotation: () => ({
                     ...baseAnnotation,
                     type: "group",
                     data: {
                         title: "Group",
+                    },
+                }),
+                freehandAnnotation: () => ({
+                    ...baseAnnotation,
+                    type: "freehand",
+                    data: {
+                        thickness: annotationOptions.lineThickness,
+                        line: [position],
                     },
                 }),
                 pointer: () => {
@@ -65,14 +85,58 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
     });
 
     toolbarStore.onInputCatcherEvent("pointermove", ({ position }) => {
+        if (toolbarStore.currentTool === "freehandEraser") {
+            return;
+        }
+
         if (annotation && start) {
-            positionAnnotation(start, position, annotation);
+            if (annotation.type === "freehand") {
+                annotationStore.addPoint(annotation.id, position);
+            } else {
+                positionAnnotation(start, position, annotation);
+            }
         }
     });
 
     toolbarStore.onInputCatcherEvent("pointerup", () => {
-        toolbarStore.currentTool = "pointer";
+        if (toolbarStore.currentTool === "freehandEraser") {
+            return;
+        } else if (annotation?.type === "freehand") {
+            finalizeFreehandAnnotation(annotation);
+        } else {
+            toolbarStore.currentTool = "pointer";
+        }
+
+        annotation = null;
     });
+
+    toolbarStore.onInputCatcherEvent("temporarilyDisabled", () => {
+        if (annotation?.type === "freehand") {
+            finalizeFreehandAnnotation(annotation);
+            annotation = null;
+        }
+    });
+
+    const finalizeFreehandAnnotation = (annotation: BaseWorkflowAnnotation) => {
+        const freehandAnnotation = annotationStore.annotationsRecord[annotation.id];
+        assertDefined(freehandAnnotation);
+        if (freehandAnnotation.type !== "freehand") {
+            throw new Error("Annotation is not of type freehandAnnotation");
+        }
+
+        // smooth
+        const xyLine = freehandAnnotation.data.line.map((point) => ({ x: point[0], y: point[1] }));
+        const simpleLine = simplify(xyLine, annotationOptions.smoothing).map((point) => [
+            point.x,
+            point.y,
+        ]) as Array<Vector>;
+
+        // normalize
+        const line = simpleLine.map((p) => vecSubtract(p, freehandAnnotation.position));
+
+        annotationStore.changeData(freehandAnnotation.id, { ...freehandAnnotation.data, line });
+        annotationStore.clearJustCreated(freehandAnnotation.id);
+    };
 
     const positionAnnotation = (pointA: Vector, pointB: Vector, annotation: BaseWorkflowAnnotation) => {
         if (toolbarStore.snapActive) {

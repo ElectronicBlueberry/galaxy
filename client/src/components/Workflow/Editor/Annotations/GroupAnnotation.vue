@@ -203,7 +203,7 @@ const cssVariables = computed(() => {
 });
 
 onMounted(() => {
-    if (props.annotation.userCreated && editableElement.value) {
+    if (annotationStore.isJustCreated(props.annotation.id) && editableElement.value) {
         selectAllText(editableElement.value);
     }
 });

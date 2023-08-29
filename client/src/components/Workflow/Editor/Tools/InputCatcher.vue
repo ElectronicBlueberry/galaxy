@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useEventListener, useMagicKeys } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { useEventListener } from "@vueuse/core";
+import { computed, ref, watch } from "vue";
 
 import { Transform } from "@/components/Workflow/Editor/modules/geometry";
 import { useWorkflowStores } from "@/composables/workflowStores";
@@ -21,6 +21,12 @@ const inverseCanvasTransform = computed(() =>
         .inverse()
 );
 
+const style = computed(() => ({
+    transform: `matrix(${inverseCanvasTransform.value.matrix.join(",")})`,
+}));
+
+let lastPosition = [0, 0] as [number, number];
+
 useEventListener(inputCatcher, [...events], (event: PointerEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -29,27 +35,40 @@ useEventListener(inputCatcher, [...events], (event: PointerEvent) => {
         type: event.type as (typeof events)[number],
         position,
     };
+    lastPosition = position;
     toolbarStore.emitInputCatcherEvent(event.type as (typeof events)[number], catcherEvent);
 });
 
-const { shift, space, alt, ctrl } = useMagicKeys();
-const temporarilyDisabled = computed(() => shift?.value || space?.value || alt?.value || ctrl?.value);
+watch(
+    () => toolbarStore.inputCatcherEnabled,
+    () => {
+        if (toolbarStore.inputCatcherEnabled) {
+            toolbarStore.emitInputCatcherEvent("temporarilyDisabled", {
+                type: "temporarilyDisabled",
+                position: lastPosition,
+            });
+        }
+    }
+);
 </script>
 
 <template>
-    <div v-if="toolbarStore.inputCatcherActive && !temporarilyDisabled" ref="inputCatcher" class="input-catcher"></div>
+    <div
+        v-if="toolbarStore.inputCatcherActive && toolbarStore.inputCatcherEnabled"
+        ref="inputCatcher"
+        class="input-catcher"
+        :style="style"></div>
 </template>
 
 <style scoped lang="scss">
 .input-catcher {
     position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
     z-index: 1500;
     width: 100%;
     height: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     cursor: crosshair;
 }
 </style>

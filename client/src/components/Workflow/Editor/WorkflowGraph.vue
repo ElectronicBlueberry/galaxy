@@ -1,6 +1,5 @@
 <template>
     <div id="workflow-canvas" class="unified-panel-body workflow-canvas">
-        <InputCatcher :transform="transform" />
         <ZoomControl :zoom-level="scale" :pan="transform" @onZoom="onZoom" @update:pan="panBy" />
         <ToolBar v-if="!readonly" />
         <div id="canvas-container" ref="canvas" class="canvas-content" @drop.prevent @dragover.prevent>
@@ -9,6 +8,7 @@
                 :viewport-bounding-box="viewportBoundingBox"
                 :transform="transform" />
             <div class="node-area" :style="canvasStyle">
+                <InputCatcher :transform="transform" />
                 <WorkflowEdges
                     :transform="transform"
                     :dragging-terminal="draggingTerminal"

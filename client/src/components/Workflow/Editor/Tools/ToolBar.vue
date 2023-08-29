@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faMarkdown } from "@fortawesome/free-brands-svg-icons";
-import { faMagnet, faMousePointer, faObjectGroup } from "@fortawesome/free-solid-svg-icons";
+import { faEraser, faMagnet, faMousePointer, faObjectGroup, faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useMagicKeys, whenever } from "@vueuse/core";
 import { BButton, BButtonGroup, BFormInput } from "bootstrap-vue";
 import { computed, toRefs, watch } from "vue";
 
@@ -15,7 +16,7 @@ import { useToolLogic } from "./useToolLogic";
 
 import ColourSelector from "@/components/Workflow/Editor/Annotations/ColourSelector.vue";
 
-library.add(faMagnet, faMousePointer, faObjectGroup, faMarkdown);
+library.add(faMagnet, faMousePointer, faObjectGroup, faMarkdown, faPen, faEraser);
 
 const { toolbarStore, annotationStore } = useWorkflowStores();
 const { snapActive, currentTool } = toRefs(toolbarStore);
@@ -24,9 +25,9 @@ const { annotationOptions } = toolbarStore;
 
 const snapButtonTitle = computed(() => {
     if (snapActive.value) {
-        return "Deactivate magnet snapping";
+        return "Deactivate snapping (Ctrl + 2)";
     } else {
-        return "Activate magnet snapping";
+        return "Activate snapping (Ctrl + 2)";
     }
 });
 
@@ -83,7 +84,25 @@ const fontSize = computed({
     },
 });
 
+const thicknessId = useUid("thickness-");
+
+const smoothingId = useUid("smoothing-");
+
+function onRemoveAllFreehand() {
+    annotationStore.deleteFreehandAnnotations();
+}
+
 useToolLogic(toolbarStore, annotationStore);
+
+const { ctrl_1, ctrl_2, ctrl_3, ctrl_4, ctrl_5, ctrl_6, ctrl_7 } = useMagicKeys();
+
+whenever(ctrl_1!, () => (toolbarStore.currentTool = "pointer"));
+whenever(ctrl_2!, () => (toolbarStore.snapActive = !toolbarStore.snapActive));
+whenever(ctrl_3!, () => (toolbarStore.currentTool = "textAnnotation"));
+whenever(ctrl_4!, () => (toolbarStore.currentTool = "markdownAnnotation"));
+whenever(ctrl_5!, () => (toolbarStore.currentTool = "groupAnnotation"));
+whenever(ctrl_6!, () => (toolbarStore.currentTool = "freehandAnnotation"));
+whenever(ctrl_7!, () => (toolbarStore.currentTool = "freehandEraser"));
 </script>
 
 <template>
@@ -93,7 +112,7 @@ useToolLogic(toolbarStore, annotationStore);
                 <BButton
                     v-b-tooltip.hover.noninteractive.right
                     class="button"
-                    title="Pointer Tool"
+                    title="Pointer Tool (Ctrl + 1)"
                     :pressed="currentTool === 'pointer'"
                     variant="outline-primary"
                     @click="onClickPointer">
@@ -108,11 +127,12 @@ useToolLogic(toolbarStore, annotationStore);
                     <FontAwesomeIcon icon="fa-magnet" size="lg" />
                 </BButton>
             </BButtonGroup>
+
             <BButtonGroup vertical>
                 <BButton
                     v-b-tooltip.hover.noninteractive.right
                     class="button font-weight-bold"
-                    title="Add text annotation"
+                    title="Text annotation (Ctrl + 3)"
                     :pressed="currentTool === 'textAnnotation'"
                     variant="outline-primary"
                     @click="() => onAnnotationToolClick('textAnnotation')">
@@ -121,7 +141,7 @@ useToolLogic(toolbarStore, annotationStore);
                 <BButton
                     v-b-tooltip.hover.noninteractive.right
                     class="button"
-                    title="Add markdown annotation"
+                    title="Markdown annotation (Ctrl + 4)"
                     :pressed="currentTool === 'markdownAnnotation'"
                     variant="outline-primary"
                     @click="() => onAnnotationToolClick('markdownAnnotation')">
@@ -130,16 +150,42 @@ useToolLogic(toolbarStore, annotationStore);
                 <BButton
                     v-b-tooltip.hover.noninteractive.right
                     class="button"
-                    title="Add group annotation"
+                    title="Group annotation (Ctrl + 5)"
                     :pressed="currentTool === 'groupAnnotation'"
                     variant="outline-primary"
                     @click="() => onAnnotationToolClick('groupAnnotation')">
                     <FontAwesomeIcon icon="fa-object-group" size="lg" />
                 </BButton>
             </BButtonGroup>
+
+            <BButtonGroup vertical>
+                <BButton
+                    v-b-tooltip.hover.noninteractive.right
+                    title="Freehand Pen (Ctrl + 6)"
+                    :pressed="currentTool === 'freehandAnnotation'"
+                    class="button"
+                    variant="outline-primary"
+                    @click="() => onAnnotationToolClick('freehandAnnotation')">
+                    <FontAwesomeIcon icon="fa-pen" size="lg" />
+                </BButton>
+                <BButton
+                    v-b-tooltip.hover.noninteractive.right
+                    title="Freehand Eraser (Ctrl + 7)"
+                    :pressed="currentTool === 'freehandEraser'"
+                    class="button"
+                    variant="outline-primary"
+                    @click="() => onAnnotationToolClick('freehandEraser')">
+                    <FontAwesomeIcon icon="fa-eraser" size="lg" />
+                </BButton>
+            </BButtonGroup>
         </div>
         <div class="options">
-            <div v-if="toolbarStore.snapActive" class="option wide">
+            <div
+                v-if="
+                    toolbarStore.snapActive &&
+                    !['freehandAnnotation', 'freehandEraser'].includes(toolbarStore.currentTool)
+                "
+                class="option wide">
                 <label :for="snappingDistanceId" class="flex-label">
                     <span class="font-weight-bold">Snapping Distance</span>
                     {{ toolbarStore.snapDistance }} pixels
@@ -170,7 +216,7 @@ useToolLogic(toolbarStore, annotationStore);
                 </BButtonGroup>
             </div>
 
-            <div v-if="toolbarStore.currentTool !== 'pointer'" class="option buttons">
+            <div v-if="!['pointer', 'freehandEraser'].includes(toolbarStore.currentTool)" class="option buttons">
                 <ColourSelector
                     :colour="annotationOptions.colour"
                     class="colour-selector"
@@ -183,6 +229,42 @@ useToolLogic(toolbarStore, annotationStore);
                     {{ annotationOptions.textSize }}00%
                 </label>
                 <BFormInput :id="fontSizeId" v-model="fontSize" type="range" min="1" max="5" step="1" />
+            </div>
+
+            <div v-if="toolbarStore.currentTool === 'freehandAnnotation'" class="option small">
+                <label :for="thicknessId" class="flex-label">
+                    <span class="font-weight-bold">Size</span>
+                    {{ annotationOptions.lineThickness }} pixels
+                </label>
+                <BFormInput
+                    :id="thicknessId"
+                    v-model="annotationOptions.lineThickness"
+                    type="range"
+                    min="4"
+                    max="20"
+                    step="1" />
+            </div>
+
+            <div v-if="toolbarStore.currentTool === 'freehandAnnotation'" class="option small">
+                <label :for="smoothingId" class="flex-label">
+                    <span class="font-weight-bold">Smoothing</span>
+                    {{ annotationOptions.smoothing }}
+                </label>
+                <BFormInput
+                    :id="smoothingId"
+                    v-model="annotationOptions.smoothing"
+                    type="range"
+                    min="1"
+                    max="10"
+                    step="1" />
+            </div>
+
+            <div
+                v-if="['freehandAnnotation', 'freehandEraser'].includes(toolbarStore.currentTool)"
+                class="option buttons">
+                <BButton class="button" title="Remove all freehand annotations" @click="onRemoveAllFreehand">
+                    Remove all
+                </BButton>
             </div>
         </div>
     </div>

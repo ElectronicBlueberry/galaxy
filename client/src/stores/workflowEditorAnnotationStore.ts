@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { computed, del, ref, set } from "vue";
 
 import { Colour } from "@/components/Workflow/Editor/Annotations/colours";
+import { vecAdd, vecMax, vecMin, vecSubtract } from "@/components/Workflow/Editor/modules/geometry";
 import { assertDefined } from "@/utils/assertions";
 import { hasKeys, match } from "@/utils/utils";
 
@@ -14,7 +15,6 @@ export interface BaseWorkflowAnnotation {
     position: [number, number];
     size: [number, number];
     data: unknown;
-    userCreated?: true;
 }
 
 export interface TextWorkflowAnnotation extends BaseWorkflowAnnotation {
@@ -73,14 +73,20 @@ function assertAnnotationDataValid(
     }
 }
 
+interface AnnotationMetadata {
+    justCreated?: boolean;
+}
+
 export type WorkflowAnnotationStore = ReturnType<typeof useWorkflowAnnotationStore>;
 
 export const useWorkflowAnnotationStore = (workflowId: string) => {
     return defineStore(`workflowAnnotationStore${workflowId}`, () => {
-        const annotationsRecord = ref<Record<string, WorkflowAnnotation>>({});
+        const annotationsRecord = ref<Record<number, WorkflowAnnotation>>({});
+        const localAnnotationsMetadata = ref<Record<number, AnnotationMetadata>>({});
 
         const $reset = () => {
             annotationsRecord.value = {};
+            localAnnotationsMetadata.value = {};
         };
 
         const annotations = computed(() => Object.values(annotationsRecord.value));
@@ -118,6 +124,23 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             set(annotation, "data", data);
         }
 
+        function addPoint(id: number, point: [number, number]) {
+            const annotation = getAnnotation.value(id);
+            if (!(annotation.type === "freehand")) {
+                throw new Error("Can only add points to freehand annotation");
+            }
+
+            annotation.data.line.push(point);
+
+            annotation.size = vecMax(annotation.size, vecSubtract(point, annotation.position));
+
+            const prevPosition = annotation.position;
+            annotation.position = vecMin(annotation.position, point);
+
+            const diff = vecSubtract(prevPosition, annotation.position);
+            annotation.size = vecAdd(annotation.size, diff);
+        }
+
         function changeColour(id: number, colour: WorkflowAnnotationColour) {
             const annotation = getAnnotation.value(id);
             set(annotation, "colour", colour);
@@ -133,8 +156,36 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
          * @param annotation
          */
         function createAnnotation(annotation: BaseWorkflowAnnotation) {
-            annotation.userCreated = true;
+            markJustCreated(annotation.id);
             addAnnotations([annotation as WorkflowAnnotation]);
+        }
+
+        const isJustCreated = computed(() => (id: number) => localAnnotationsMetadata.value[id]?.justCreated ?? false);
+
+        function markJustCreated(id: number) {
+            const metadata = localAnnotationsMetadata.value[id];
+
+            if (metadata) {
+                set(metadata, "justCreated", true);
+            } else {
+                set(localAnnotationsMetadata.value, id, { justCreated: true });
+            }
+        }
+
+        function clearJustCreated(id: number) {
+            const metadata = localAnnotationsMetadata.value[id];
+
+            if (metadata) {
+                del(metadata, "justCreated");
+            }
+        }
+
+        function deleteFreehandAnnotations() {
+            Object.values(annotationsRecord.value).forEach((annotation) => {
+                if (annotation.type === "freehand") {
+                    deleteAnnotation(annotation.id);
+                }
+            });
         }
 
         return {
@@ -147,8 +198,13 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             changeSize,
             changeData,
             changeColour,
+            addPoint,
             deleteAnnotation,
             createAnnotation,
+            isJustCreated,
+            markJustCreated,
+            clearJustCreated,
+            deleteFreehandAnnotations,
             $reset,
         };
     })();
