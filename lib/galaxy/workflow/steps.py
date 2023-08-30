@@ -14,7 +14,7 @@ def attach_ordered_steps(workflow):
     """Attempt to topologically order steps and attach to workflow. If this
     fails - the workflow contains cycles so it mark it as such.
     """
-    ordered_steps = order_workflow_steps(workflow.steps, workflow.annotations)
+    ordered_steps = order_workflow_steps(workflow.steps, workflow.workflow_annotations)
     workflow.has_cycles = True
     if ordered_steps:
         workflow.has_cycles = False
@@ -24,7 +24,7 @@ def attach_ordered_steps(workflow):
     return workflow.has_cycles
 
 
-def order_workflow_steps(steps, annotations):
+def order_workflow_steps(steps, workflow_annotations):
     """
     Perform topological sort of the steps, return ordered or None
     """
@@ -38,17 +38,17 @@ def order_workflow_steps(steps, annotations):
         # find minimum left and top values to normalize position
         min_left = min(step.position["left"] for step in steps)
         min_top = min(step.position["top"] for step in steps)
-        if annotations:
+        if workflow_annotations:
             min_left_annotations = min(
-                annotation.position[0] for annotation in annotations if annotation.type != "freehand"
+                annotation.position[0] for annotation in workflow_annotations if annotation.type != "freehand"
             )
             min_top_annotations = min(
-                annotation.position[1] for annotation in annotations if annotation.type != "freehand"
+                annotation.position[1] for annotation in workflow_annotations if annotation.type != "freehand"
             )
             min_left = min(min_left_annotations, min_left)
             min_top = min(min_top_annotations, min_top)
             # normalize by min_left and min_top
-            for annotation in annotations:
+            for annotation in workflow_annotations:
                 annotation.position = [annotation.position[0] - min_left, annotation.position[1] - min_top]
         # normalize steps
         for step in steps:

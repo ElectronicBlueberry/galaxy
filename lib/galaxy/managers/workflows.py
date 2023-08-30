@@ -797,12 +797,12 @@ class WorkflowContentsManager(UsesAnnotations):
         workflow.has_cycles = True
         workflow.steps = steps
 
-        annotations: List[model.WorkflowAnnotation] = []
-        for annotation_dict in data.get("annotations", []):
+        workflow_annotations: List[model.WorkflowAnnotation] = []
+        for annotation_dict in data.get("workflow_annotations", []):
             annotation = model.WorkflowAnnotation.from_dict(annotation_dict)
-            annotations.append(annotation)
+            workflow_annotations.append(annotation)
 
-        workflow.annotations = annotations
+        workflow.workflow_annotations = workflow_annotations
 
         # we can't reorder subworkflows, as step connections would become invalid
         if not is_subworkflow:
@@ -1122,7 +1122,7 @@ class WorkflowContentsManager(UsesAnnotations):
         data["creator"] = workflow.creator_metadata
         data["source_metadata"] = workflow.source_metadata
         data["annotation"] = self.get_item_annotation_str(trans.sa_session, trans.user, stored) or ""
-        data["annotations"] = [annotation.to_dict() for annotation in workflow.annotations]
+        data["workflow_annotations"] = [annotation.to_dict() for annotation in workflow.workflow_annotations]
 
         output_label_index = set()
         input_step_types = set(workflow.input_step_types)
@@ -1358,7 +1358,7 @@ class WorkflowContentsManager(UsesAnnotations):
             data["uuid"] = str(workflow.uuid)
         steps: Dict[int, Dict[str, Any]] = {}
         data["steps"] = steps
-        data["annotations"] = [annotation.to_dict() for annotation in workflow.annotations]
+        data["workflow_annotations"] = [annotation.to_dict() for annotation in workflow.workflow_annotations]
         if workflow.reports_config:
             data["report"] = workflow.reports_config
         if workflow.creator_metadata:

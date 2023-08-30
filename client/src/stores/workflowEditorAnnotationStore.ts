@@ -89,7 +89,7 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             localAnnotationsMetadata.value = {};
         };
 
-        const annotations = computed(() => Object.values(annotationsRecord.value));
+        const workflowAnnotations = computed(() => Object.values(annotationsRecord.value));
         const addAnnotations = (annotationsArray: WorkflowAnnotation[], defaultPosition: [number, number] = [0, 0]) => {
             annotationsArray.forEach((annotation) => {
                 const newAnnotation = structuredClone(annotation);
@@ -100,7 +100,9 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
             });
         };
 
-        const highestAnnotationId = computed(() => annotations.value[annotations.value.length - 1]?.id ?? -1);
+        const highestAnnotationId = computed(
+            () => workflowAnnotations.value[workflowAnnotations.value.length - 1]?.id ?? -1
+        );
 
         const getAnnotation = computed(() => (id: number) => {
             const annotation = annotationsRecord.value[id];
@@ -189,7 +191,7 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
         }
 
         return {
-            annotations,
+            workflowAnnotations,
             annotationsRecord,
             highestAnnotationId,
             addAnnotations,

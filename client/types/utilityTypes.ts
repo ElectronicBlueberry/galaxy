@@ -1,5 +1,5 @@
 /** length of const array or tuple */
-export type Length<T extends any[]> = T["length"];
+export type Length<T extends any[] | readonly any[]> = T["length"];
 
 /** build a tuple with length L, and type T */
 export type Tuple<L extends number, T = any, R extends T[] = []> = R extends { length: L } ? R : Tuple<L, T, [...R, T]>;
@@ -26,3 +26,23 @@ export type First<A extends readonly [...any]> = A[Length<A>];
 export type GetComponentPropTypes<
     T extends import("vue/types/v3-component-public-instance").ComponentPublicInstanceConstructor
 > = InstanceType<T>["$props"];
+
+/** Convert snake case string literal to camel case string literal */
+export type SnakeToCamelCase<S extends string> = S extends `${infer T}_${infer U}`
+    ? `${T}${Capitalize<SnakeToCamelCase<U>>}`
+    : S;
+
+/** Convert camel case string literal to snake case string literal */
+export type CamelToSnakeCase<S extends string> = S extends `${infer T}${infer U}`
+    ? `${T extends Capitalize<T> ? "_" : ""}${Lowercase<T>}${CamelToSnakeCase<U>}`
+    : S;
+
+/** Converts an object type or interface to the same type with camel case keys */
+export type AsCamelCase<R extends Record<string, any> | Readonly<Record<string, any>>> = {
+    [K in keyof R as SnakeToCamelCase<K & string>]: R[K];
+};
+
+/** Converts an object type or interface to the same type with snake case keys */
+export type AsSnakeCase<R extends Record<string, any> | Readonly<Record<string, any>>> = {
+    [K in keyof R as CamelToSnakeCase<K & string>]: R[K];
+};

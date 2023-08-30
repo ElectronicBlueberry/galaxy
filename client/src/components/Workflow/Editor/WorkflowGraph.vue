@@ -33,7 +33,7 @@
                     @onDeactivate="onDeactivate"
                     v-on="$listeners" />
                 <WorkflowAnnotation
-                    v-for="annotation in annotations"
+                    v-for="annotation in workflowAnnotations"
                     :id="`workflow-annotation-${annotation.id}`"
                     :key="annotation.id"
                     :annotation="annotation"
@@ -46,7 +46,7 @@
         <WorkflowMinimap
             v-if="elementBounding"
             :steps="steps"
-            :annotations="annotations"
+            :annotations="workflowAnnotations"
             :viewport-bounds="elementBounding"
             :viewport-bounding-box="viewportBoundingBox"
             @panBy="panBy"
@@ -171,7 +171,7 @@ const canvasStyle = computed(() => {
 });
 
 const { annotationStore } = useWorkflowStores();
-const { annotations } = storeToRefs(annotationStore);
+const { workflowAnnotations } = storeToRefs(annotationStore);
 </script>
 
 <style scoped land="scss">

@@ -1,3 +1,5 @@
+import { AsCamelCase } from "types/utilityTypes";
+
 import { useWorkflowAnnotationStore, type WorkflowAnnotation } from "@/stores/workflowEditorAnnotationStore";
 import { type ConnectionOutputLink, type Steps, useWorkflowStepStore } from "@/stores/workflowStepStore";
 
@@ -9,7 +11,7 @@ interface Workflow {
     version: number;
     report: any;
     steps: Steps;
-    annotations: WorkflowAnnotation[];
+    workflow_annotations: WorkflowAnnotation[];
 }
 
 /**
@@ -61,7 +63,7 @@ export async function fromSimple(
             });
         });
 
-        data.annotations.forEach((annotation, index) => {
+        data.workflow_annotations.forEach((annotation, index) => {
             annotation.id = annotationStore.highestAnnotationId + 1 + index;
         });
     }
@@ -70,10 +72,10 @@ export async function fromSimple(
         stepStore.addStep(step);
     });
 
-    annotationStore.addAnnotations(data.annotations, [defaultPosition.left, defaultPosition.top]);
+    annotationStore.addAnnotations(data.workflow_annotations, [defaultPosition.left, defaultPosition.top]);
 }
 
-export function toSimple(workflow: Workflow) {
+export function toSimple(workflow: AsCamelCase<Workflow>): Omit<Workflow, "version"> {
     const steps = workflow.steps;
     const report = workflow.report;
     const license = workflow.license;
@@ -81,9 +83,9 @@ export function toSimple(workflow: Workflow) {
     const annotation = workflow.annotation;
     const name = workflow.name;
 
-    const annotations = workflow.annotations.filter(
+    const workflow_annotations = workflow.workflowAnnotations.filter(
         (annotation) => !(annotation.type === "text" && annotation.data.text === "")
     );
 
-    return { steps, report, license, creator, annotation, name, annotations };
+    return { steps, report, license, creator, annotation, name, workflow_annotations };
 }

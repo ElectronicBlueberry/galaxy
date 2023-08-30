@@ -7380,7 +7380,7 @@ class Workflow(Base, Dictifiable, RepresentById):
         cascade="all, delete-orphan",
         lazy=False,
     )
-    annotations: List["WorkflowAnnotation"] = relationship(
+    workflow_annotations: List["WorkflowAnnotation"] = relationship(
         "WorkflowAnnotation",
         back_populates="workflow",
         primaryjoin=(lambda: Workflow.id == WorkflowAnnotation.workflow_id),  # type: ignore[has-type]
@@ -7977,7 +7977,9 @@ class WorkflowAnnotation(Base, RepresentById):
     colour = Column(String(16))
     data = Column(JSONType)
     workflow = relationship(
-        "Workflow", primaryjoin=(lambda: Workflow.id == WorkflowAnnotation.workflow_id), back_populates="annotations"
+        "Workflow",
+        primaryjoin=(lambda: Workflow.id == WorkflowAnnotation.workflow_id),
+        back_populates="workflow_annotations",
     )
 
     def to_dict(self):

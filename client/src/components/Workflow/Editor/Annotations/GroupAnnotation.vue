@@ -123,7 +123,7 @@ function getStepsInBounds(bounds: AxisAlignedBoundingBox) {
 function getAnnotationsInBounds(bounds: AxisAlignedBoundingBox) {
     const annotations: WorkflowAnnotation[] = [];
 
-    annotationStore.annotations.forEach((annotation) => {
+    annotationStore.workflowAnnotations.forEach((annotation) => {
         const annotationRect: Rectangle = {
             x: annotation.position[0],
             y: annotation.position[1],

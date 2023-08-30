@@ -236,7 +236,7 @@ export default {
 
         const { connectionStore, stepStore, stateStore, annotationStore } = provideScopedWorkflowStores(props.id);
 
-        const { annotations } = storeToRefs(annotationStore);
+        const { workflowAnnotations } = storeToRefs(annotationStore);
         const { getStepIndex, steps } = storeToRefs(stepStore);
         const { activeNodeId } = storeToRefs(stateStore);
         const activeStep = computed(() => {
@@ -275,7 +275,7 @@ export default {
             hasInvalidConnections,
             stepStore,
             steps,
-            annotations,
+            workflowAnnotations,
             nodeIndex: getStepIndex,
             datatypes,
             activeStep,
