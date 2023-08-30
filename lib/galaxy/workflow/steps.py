@@ -39,8 +39,12 @@ def order_workflow_steps(steps, annotations):
         min_left = min(step.position["left"] for step in steps)
         min_top = min(step.position["top"] for step in steps)
         if annotations:
-            min_left_annotations = min(annotation.position[0] for annotation in annotations)
-            min_top_annotations = min(annotation.position[1] for annotation in annotations)
+            min_left_annotations = min(
+                annotation.position[0] for annotation in annotations if annotation.type != "freehand"
+            )
+            min_top_annotations = min(
+                annotation.position[1] for annotation in annotations if annotation.type != "freehand"
+            )
             min_left = min(min_left_annotations, min_left)
             min_top = min(min_top_annotations, min_top)
             # normalize by min_left and min_top
