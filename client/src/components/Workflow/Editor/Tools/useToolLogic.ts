@@ -47,8 +47,8 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
                     data: {
                         size: annotationOptions.textSize,
                         text: "Enter Text",
-                        bold: annotationOptions.bold,
-                        italic: annotationOptions.italic,
+                        bold: annotationOptions.bold || undefined,
+                        italic: annotationOptions.italic || undefined,
                     } as BaseWorkflowAnnotation["data"],
                 }),
                 markdownAnnotation: () => ({
