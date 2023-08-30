@@ -132,7 +132,10 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
         ]) as Array<Vector>;
 
         // normalize
-        const line = simpleLine.map((p) => vecSubtract(p, freehandAnnotation.position));
+        const normalized = simpleLine.map((p) => vecSubtract(p, freehandAnnotation.position));
+
+        // reduce significant figures
+        const line = normalized.map((p) => [Math.round(p[0] * 10) / 10, Math.round(p[1] * 10) / 10] as Vector);
 
         annotationStore.changeData(freehandAnnotation.id, { ...freehandAnnotation.data, line });
         annotationStore.clearJustCreated(freehandAnnotation.id);
