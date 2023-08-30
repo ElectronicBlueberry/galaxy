@@ -6,7 +6,7 @@ import { type WorkflowEditorToolbarStore } from "@/stores/workflowEditorToolbarS
 import { assertDefined } from "@/utils/assertions";
 import { match } from "@/utils/utils";
 
-import { vecMax, vecMin, vecSnap, vecSubtract, type Vector } from "../modules/geometry";
+import { vecMax, vecMin, vecReduceFigures, vecSnap, vecSubtract, type Vector } from "../modules/geometry";
 
 export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotationStore: WorkflowAnnotationStore) {
     let annotation: BaseWorkflowAnnotation | null = null;
@@ -135,9 +135,11 @@ export function useToolLogic(toolbarStore: WorkflowEditorToolbarStore, annotatio
         const normalized = simpleLine.map((p) => vecSubtract(p, freehandAnnotation.position));
 
         // reduce significant figures
-        const line = normalized.map((p) => [Math.round(p[0] * 10) / 10, Math.round(p[1] * 10) / 10] as Vector);
+        const line = normalized.map((p) => vecReduceFigures(p) as Vector);
 
         annotationStore.changeData(freehandAnnotation.id, { ...freehandAnnotation.data, line });
+        annotationStore.changePosition(freehandAnnotation.id, vecReduceFigures(freehandAnnotation.position));
+        annotationStore.changeSize(freehandAnnotation.id, vecReduceFigures(freehandAnnotation.size));
         annotationStore.clearJustCreated(freehandAnnotation.id);
     };
 

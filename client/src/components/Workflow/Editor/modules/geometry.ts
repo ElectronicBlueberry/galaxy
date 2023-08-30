@@ -234,3 +234,9 @@ export function vecSubtract(a: Vector, b: Vector): Vector {
 export function vecAdd(a: Vector, b: Vector): Vector {
     return [a[0] + b[0], a[1] + b[1]];
 }
+
+export function vecReduceFigures(a: Vector, significantFigures = 1): Vector {
+    const factor = Math.pow(10, significantFigures);
+
+    return [Math.round(a[0] * factor) / factor, Math.round(a[1] * factor) / factor];
+}

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { computed, del, ref, set } from "vue";
 
 import { Colour } from "@/components/Workflow/Editor/Annotations/colours";
-import { vecAdd, vecMax, vecMin, vecSubtract } from "@/components/Workflow/Editor/modules/geometry";
+import { vecAdd, vecMax, vecMin, vecReduceFigures, vecSubtract } from "@/components/Workflow/Editor/modules/geometry";
 import { assertDefined } from "@/utils/assertions";
 import { hasKeys, match } from "@/utils/utils";
 
@@ -112,12 +112,12 @@ export const useWorkflowAnnotationStore = (workflowId: string) => {
 
         function changePosition(id: number, position: [number, number]) {
             const annotation = getAnnotation.value(id);
-            set(annotation, "position", position);
+            set(annotation, "position", vecReduceFigures(position));
         }
 
         function changeSize(id: number, size: [number, number]) {
             const annotation = getAnnotation.value(id);
-            set(annotation, "size", size);
+            set(annotation, "size", vecReduceFigures(size));
         }
 
         function changeData(id: number, data: unknown) {
