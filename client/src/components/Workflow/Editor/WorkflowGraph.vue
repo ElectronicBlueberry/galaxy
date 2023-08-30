@@ -35,7 +35,7 @@
                 <WorkflowAnnotation
                     v-for="annotation in workflowAnnotations"
                     :id="`workflow-annotation-${annotation.id}`"
-                    :key="annotation.id"
+                    :key="`workflow-annotation-${annotation.id}`"
                     :annotation="annotation"
                     :scale="scale"
                     :readonly="readonly"
