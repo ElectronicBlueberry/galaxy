@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { ComputedRef } from "vue";
 import { computed, ref, useAttrs } from "vue";
 
-import type { FormParameterAttributes, FormParameterTypes, FormParameterValue } from "./parameterTypes";
+import type { FormParameterAttributes, FormParameterType, FormParameterValue } from "./parameterTypes";
 
 import FormBoolean from "./Elements/FormBoolean.vue";
 import FormColor from "./Elements/FormColor.vue";
@@ -26,7 +26,7 @@ import FormUpload from "./Elements/FormUpload.vue";
 
 interface FormElementProps {
     id?: string;
-    type?: FormParameterTypes;
+    type?: FormParameterType;
     value?: FormParameterValue;
     title?: string;
     refreshOnChange?: boolean;

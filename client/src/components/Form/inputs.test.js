@@ -1,5 +1,5 @@
+import { matchCase, matchInputs, validateInputs, visitInputs } from "./inputs";
 import toolModel from "./test-data/tool";
-import { matchCase, matchInputs, validateInputs, visitInputs } from "./utilities";
 
 function visitInputsString(inputs) {
     let results = "";

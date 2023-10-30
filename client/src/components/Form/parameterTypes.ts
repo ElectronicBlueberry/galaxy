@@ -4,7 +4,7 @@ export type FormParameterAttributes = {
     [attribute: string]: any;
 };
 
-export type FormParameterTypes =
+export type FormParameterType =
     | "boolean"
     | "hidden"
     | "hidden_data"
