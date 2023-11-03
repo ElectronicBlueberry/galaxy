@@ -22,6 +22,7 @@
         </div>
         <div v-show="expanded" class="portlet-content">
             <slot name="body" />
+            <slot />
         </div>
     </div>
 </template>
