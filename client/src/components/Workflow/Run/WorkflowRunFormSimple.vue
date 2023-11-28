@@ -51,7 +51,9 @@
             @onChange="onChange"
             @onValidation="onValidation" />
         <!-- Options to default one way or the other, disable if admins want, etc.. -->
-        <a href="#" class="workflow-expand-form-link" @click="$emit('showAdvanced')">Expand to full workflow form.</a>
+        <RouterLink :to="`?id=${model.workflowId}&simplified_workflow_run_ui=off`" class="workflow-expand-form-link">
+            Expand to full workflow form.
+        </RouterLink>
     </div>
 </template>
 
@@ -63,6 +65,7 @@ import { isWorkflowInput } from "components/Workflow/constants";
 import { storeToRefs } from "pinia";
 import { errorMessageAsString } from "utils/simple-error";
 import Vue from "vue";
+import { RouterLink } from "vue-router";
 
 import { useConfig } from "@/composables/config";
 import { useUserStore } from "@/stores/userStore";
@@ -75,6 +78,7 @@ export default {
         ButtonSpinner,
         FormDisplay,
         WorkflowStorageConfiguration,
+        RouterLink,
     },
     props: {
         model: {

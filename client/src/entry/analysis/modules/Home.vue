@@ -12,6 +12,8 @@ import ToolForm from "components/Tool/ToolForm";
 import WorkflowRun from "components/Workflow/Run/WorkflowRun";
 import decodeUriComponent from "decode-uri-component";
 import CenterFrame from "entry/analysis/modules/CenterFrame";
+import { computed } from "vue";
+import { useRoute } from "vue-router/composables";
 
 export default {
     components: {
@@ -28,6 +30,32 @@ export default {
             type: Object,
             required: true,
         },
+    },
+    setup(props) {
+        const route = useRoute();
+
+        const preferSimpleFormOverride = computed(() => route.query["simplified_workflow_run_ui"]);
+
+        const workflowParams = computed(() => {
+            const params = {
+                workflowId: props.query.workflow_id,
+                preferSimpleForm: props.config.simplified_workflow_run_ui === "prefer",
+                simpleFormTargetHistory: props.config.simplified_workflow_run_ui_target_history,
+                simpleFormUseJobCache: props.config.simplified_workflow_run_ui_job_cache === "on",
+            };
+
+            if (preferSimpleFormOverride.value === "prefer") {
+                params.preferSimpleForm = true;
+            } else if (preferSimpleFormOverride.value === "off") {
+                params.preferSimpleForm = false;
+            }
+
+            return params;
+        });
+
+        return {
+            workflowParams,
+        };
     },
     computed: {
         isController() {
@@ -56,22 +84,6 @@ export default {
                 result.version = tool_version.indexOf("+") >= 0 ? tool_version : decodeUriComponent(tool_version);
             }
             return result;
-        },
-        workflowParams() {
-            const workflowId = this.query.workflow_id;
-            let preferSimpleForm = this.config.simplified_workflow_run_ui == "prefer";
-            const preferSimpleFormOverride = this.query.simplified_workflow_run_ui;
-            if (preferSimpleFormOverride == "prefer") {
-                preferSimpleForm = true;
-            }
-            const simpleFormTargetHistory = this.config.simplified_workflow_run_ui_target_history;
-            const simpleFormUseJobCache = this.config.simplified_workflow_run_ui_job_cache == "on";
-            return {
-                workflowId,
-                preferSimpleForm,
-                simpleFormTargetHistory,
-                simpleFormUseJobCache,
-            };
         },
     },
 };
