@@ -30,7 +30,7 @@ const emit = defineEmits<{
 const { currentUser, currentPreferences } = storeToRefs(useUserStore());
 const { currentHistoryId } = storeToRefs(useHistoryStore());
 
-const showExecuting = ref(true);
+const showExecuting = ref(false);
 
 type Value = unknown;
 type StepData = Record<string, Value>;
@@ -58,7 +58,9 @@ function getReplacementParameters(inputs: typeof parameterData.value) {
     return getReplacements(inputs, stepData.value, parameterData.value);
 }
 
-const resourceInputs = computed(() => Object.values(props.model.workflowResourceParameters) ?? []);
+const resourceInputs = computed(() =>
+    props.model.workflowResourceParameters ? Object.values(props.model.workflowResourceParameters) : []
+);
 const resourceInputsAvailable = computed(() => resourceInputs.value.length > 0);
 const resourceData = ref({});
 
