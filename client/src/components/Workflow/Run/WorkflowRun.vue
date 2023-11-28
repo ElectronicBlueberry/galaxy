@@ -10,7 +10,9 @@
             </b-alert>
             <WorkflowRunSuccess v-else-if="!!invocations" :invocations="invocations" :workflow-name="workflowName" />
             <div v-else class="ui-form-composite">
-                <div class="ui-form-composite-messages mb-4">
+                <div
+                    v-if="hasUpgradeMessages || hasStepVersionChanges || submissionError"
+                    class="ui-form-composite-messages mb-4">
                     <b-alert v-if="hasUpgradeMessages" variant="warning" show>
                         Some tools in this workflow may have changed since it was last saved or some errors were found.
                         The workflow may still run, but any new options will have default values. Please review the
