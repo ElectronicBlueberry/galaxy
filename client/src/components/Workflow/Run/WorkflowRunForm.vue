@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faSitemap } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 
@@ -16,12 +13,9 @@ import { invokeWorkflow } from "./services";
 
 import WorkflowRunDefaultStep from "./WorkflowRunDefaultStep.vue";
 import WorkflowRunInputStep from "./WorkflowRunInputStep.vue";
-import ButtonSpinner from "@/components/Common/ButtonSpinner.vue";
 import FormCard from "@/components/Form/FormCard.vue";
 import FormDisplay from "@/components/Form/FormDisplay.vue";
 import FormElement from "@/components/Form/FormElement.vue";
-
-library.add(faSitemap);
 
 const props = defineProps<{
     model: WorkflowRunModel;
@@ -134,7 +128,7 @@ function onValidation(stepId: string, validation: Validation) {
 
 const useCachedJobs = ref(false);
 
-async function onExecute() {
+async function submitWorkflowRun() {
     for (const [stepId, stepValidation] of Object.entries(stepValidations.value)) {
         if (stepValidation) {
             stepScrollTo.value = {
@@ -180,17 +174,17 @@ async function onExecute() {
         require_exact_tool_versions: false,
     } as const;
 
-    console.debug("WorkflowRunForm::onExecute()", "Ready for submission.", jobDef);
+    console.debug("WorkflowRunForm::submitWorkflowRun()", "Ready for submission.", jobDef);
     showExecuting.value = true;
 
     try {
         const invocations = await invokeWorkflow(props.model.workflowId, jobDef);
 
-        console.debug("WorkflowRunForm::onExecute()", "Submission successful.", invocations);
+        console.debug("WorkflowRunForm::submitWorkflowRun()", "Submission successful.", invocations);
         showExecuting.value = false;
         emit("submissionSuccess", invocations);
     } catch (e) {
-        console.debug("WorkflowRunForm::onExecute()", "Submission failed.", e);
+        console.debug("WorkflowRunForm::submitWorkflowRun()", "Submission failed.", e);
         showExecuting.value = false;
 
         const errorData = maybeGetPropertyChain<Record<string, string>>(e, ["response", "data", "err_data"]);
@@ -211,7 +205,7 @@ async function onExecute() {
             } catch (errorFormatting) {
                 console.debug(
                     errorFormatting,
-                    "WorkflowRunForm::onExecute()",
+                    "WorkflowRunForm::submitWorkflowRun()",
                     "Invalid server error response format.",
                     errorData
                 );
@@ -222,24 +216,14 @@ async function onExecute() {
         }
     }
 }
+
+defineExpose({
+    submitWorkflowRun,
+});
 </script>
 
 <template>
     <div v-if="currentUser && currentHistoryId" class="workflow-expanded-form">
-        <div class="workflow-header sticky-top bg-secondary px-2 py-1 rounded mb-4">
-            <span class="d-flex flex-gapx-1">
-                <FontAwesomeIcon icon="fa-sitemap" />
-                <h1 class="h-text mb-0 font-weight-bold">Workflow: {{ props.model.name }}</h1>
-            </span>
-
-            <ButtonSpinner
-                id="run-workflow"
-                class="btn-sm"
-                title="Run Workflow"
-                :wait="showExecuting"
-                @onClick="onExecute" />
-        </div>
-
         <FormCard v-if="parameterInputsAvailable" title="Workflow Parameters">
             <FormDisplay :inputs="parameterInputs" @onChange="onParameterInputs" />
         </FormCard>
@@ -278,11 +262,3 @@ async function onExecute() {
         </div>
     </div>
 </template>
-
-<style scoped lang="scss">
-.workflow-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-</style>

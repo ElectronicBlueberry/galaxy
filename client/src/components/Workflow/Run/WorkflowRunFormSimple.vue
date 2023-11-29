@@ -8,7 +8,7 @@
                 :disabled="hasValidationErrors"
                 class="float-right"
                 title="Run Workflow"
-                @onClick="onExecute" />
+                @onClick="submitWorkflowRun" />
             <b-dropdown
                 v-if="showRuntimeSettings(currentUser)"
                 id="dropdown-form"
@@ -172,7 +172,7 @@ export default {
                 this.preferredObjectStoreId = objectStoreId;
             }
         },
-        onExecute() {
+        submitWorkflowRun() {
             const replacementParams = {};
             const inputs = {};
             for (const inputName in this.formData) {

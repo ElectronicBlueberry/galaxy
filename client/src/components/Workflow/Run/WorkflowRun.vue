@@ -28,6 +28,21 @@
                         Workflow submission failed: {{ submissionError }}
                     </b-alert>
                 </div>
+
+                <div class="workflow-run-header sticky-top bg-secondary px-2 py-1 rounded mb-4">
+                    <span class="d-flex flex-gapx-1">
+                        <FontAwesomeIcon icon="fa-sitemap" />
+                        <h1 class="h-text mb-0 font-weight-bold">Workflow: {{ model.name }}</h1>
+                    </span>
+
+                    <ButtonSpinner
+                        id="run-workflow"
+                        class="btn-sm"
+                        title="Run Workflow"
+                        :wait="showExecuting"
+                        @onClick="onRunButtonPressed" />
+                </div>
+
                 <WorkflowRunFormSimple
                     v-if="simpleForm"
                     :model="model"
@@ -47,10 +62,14 @@
 </template>
 
 <script>
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faSitemap } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import LoadingSpan from "components/LoadingSpan";
 import { mapState } from "pinia";
 import { useHistoryItemsStore } from "stores/historyItemsStore";
 import { errorMessageAsString } from "utils/simple-error";
+import { ref } from "vue";
 
 import { useHistoryStore } from "@/stores/historyStore";
 
@@ -60,12 +79,18 @@ import WorkflowRunForm from "./WorkflowRunForm";
 import WorkflowRunFormSimple from "./WorkflowRunFormSimple";
 import WorkflowRunSuccess from "./WorkflowRunSuccess";
 
+import ButtonSpinner from "@/components/Common/ButtonSpinner.vue";
+
+library.add(faSitemap);
+
 export default {
     components: {
         LoadingSpan,
         WorkflowRunSuccess,
         WorkflowRunForm,
         WorkflowRunFormSimple,
+        FontAwesomeIcon,
+        ButtonSpinner,
     },
     props: {
         workflowId: {
@@ -85,6 +110,26 @@ export default {
             default: false,
         },
     },
+    setup() {
+        const workflowRunFormSimple = ref(null);
+        const workflowRunForm = ref(null);
+        const simpleForm = ref(false);
+
+        function onRunButtonPressed() {
+            if (simpleForm.value) {
+                workflowRunFormSimple.value.submitWorkflowRun();
+            } else {
+                workflowRunForm.value.submitWorkflowRun();
+            }
+        }
+
+        return {
+            workflowRunFormSimple,
+            workflowRunForm,
+            simpleForm,
+            onRunButtonPressed,
+        };
+    },
     data() {
         return {
             error: null,
@@ -93,7 +138,6 @@ export default {
             hasStepVersionChanges: false,
             workflowName: "",
             invocations: null,
-            simpleForm: null,
             submissionError: null,
             model: null,
         };
@@ -176,3 +220,11 @@ export default {
     },
 };
 </script>
+
+<style scoped lang="scss">
+.workflow-run-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+</style>
