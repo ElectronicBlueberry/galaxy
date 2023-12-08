@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { formatDistanceToNowStrict } from "date-fns";
 import { storeToRefs } from "pinia";
 import prettyBytes from "pretty-bytes";
@@ -153,7 +154,7 @@ function onUpdatePreferredObjectStoreId(preferredObjectStoreId: string) {
                     class="rounded-0 text-decoration-none"
                     data-description="show active items button"
                     @click="setFilter('')">
-                    <span class="fa fa-map-marker" />
+                    <FontAwesomeIcon :icon="['gxd', 'viewActiveDatasets']" />
                     <span>{{ numItemsActive }}</span>
                 </b-button>
                 <b-button
@@ -166,7 +167,7 @@ function onUpdatePreferredObjectStoreId(preferredObjectStoreId: string) {
                     :pressed="getCurrentFilterVal('deleted') !== false"
                     data-description="include deleted items button"
                     @click="setFilter('deleted')">
-                    <icon icon="trash" />
+                    <FontAwesomeIcon :icon="['gxd', 'viewDeleted']" />
                     <span>{{ numItemsDeleted }}</span>
                 </b-button>
                 <b-button
@@ -179,7 +180,7 @@ function onUpdatePreferredObjectStoreId(preferredObjectStoreId: string) {
                     :pressed="getCurrentFilterVal('visible') !== true"
                     data-description="include hidden items button"
                     @click="setFilter('visible')">
-                    <icon icon="eye-slash" />
+                    <FontAwesomeIcon :icon="['gxd', 'viewHiddenDatasets']" />
                     <span>{{ numItemsHidden }}</span>
                 </b-button>
                 <b-button
@@ -207,3 +208,9 @@ function onUpdatePreferredObjectStoreId(preferredObjectStoreId: string) {
         </b-button-group>
     </div>
 </template>
+
+<style scoped>
+.history-size {
+    --fa-secondary-opacity: 1;
+}
+</style>
