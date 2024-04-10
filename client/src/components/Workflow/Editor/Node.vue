@@ -11,6 +11,8 @@
         :class="classes"
         :style="style"
         :disabled="readonly"
+        @mousedown="onMouseDown"
+        @mouseup="onMouseUp"
         @move="onMoveTo"
         @pan-by="onPanBy">
         <div
@@ -145,7 +147,6 @@ import { useWorkflowStores } from "@/composables/workflowStores";
 import type { TerminalPosition, XYPosition } from "@/stores/workflowEditorStateStore";
 import type { Step } from "@/stores/workflowStepStore";
 
-import { useMultiSelect } from "./composables/multiSelect";
 import type { OutputTerminals } from "./modules/terminals";
 
 import LoadingSpan from "@/components/LoadingSpan.vue";
@@ -269,8 +270,6 @@ function onDragConnector(dragPosition: TerminalPosition, terminal: OutputTermina
 }
 
 function onMoveTo(position: XYPosition) {
-    hasMoved = true;
-
     emit("onUpdateStepPosition", props.id, {
         top: position.y + props.scroll.y.value / props.scale,
         left: position.x + props.scroll.x.value / props.scale,
@@ -298,15 +297,7 @@ function onClone() {
     emit("onClone", props.id);
 }
 
-const { deselectAll } = useMultiSelect();
-let hasMoved = false;
-
 function makeActive() {
-    if (!hasMoved) {
-        deselectAll();
-    }
-
-    hasMoved = false;
     emit("onActivate", props.id);
 }
 
