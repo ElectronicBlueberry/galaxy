@@ -11,8 +11,6 @@
         :class="classes"
         :style="style"
         :disabled="readonly"
-        @mousedown="onMouseDown"
-        @mouseup="onMouseUp"
         @move="onMoveTo"
         @pan-by="onPanBy">
         <div
