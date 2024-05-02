@@ -2,6 +2,7 @@
 import { curveBasis, line } from "d3";
 import { computed, type PropType } from "vue";
 
+import { useUid } from "@/composables/utils/uid";
 import { useWorkflowStores } from "@/composables/workflowStores";
 import { type Connection, getConnectionId } from "@/stores/workflowConnectionStore";
 import type { TerminalPosition } from "@/stores/workflowEditorStateStore";
@@ -216,18 +217,75 @@ function getLineOffsets(inputIsMappedOver?: boolean, outputIsMappedOver?: boolea
 function keyForIndex(index: number) {
     return `${props.id ?? "no-key"}-${index}`;
 }
+
+const outputStepId = computed(() => props.connection.output.stepId);
+const inputStepId = computed(() => props.connection.input.stepId);
+
+const outputSelected = computed(() => stateStore.getStepMultiSelected(outputStepId.value));
+const inputSelected = computed(() => stateStore.getStepMultiSelected(inputStepId.value));
+
+const bothSelected = computed(() => outputSelected.value && inputSelected.value);
+const eitherSelected = computed(() => outputSelected.value || inputSelected.value);
+const showGradient = computed(() => eitherSelected.value && !bothSelected.value);
+
+/*const cssGradientAngle = computed<`${string}rad`>(() => {
+    if (!eitherSelected.value || bothSelected.value) {
+        return "0rad";
+    }
+
+    if (!props.terminalPosition) {
+        return "0rad";
+    }
+
+    const x = props.terminalPosition.endX - props.terminalPosition.startX;
+    const y = props.terminalPosition.endY - props.terminalPosition.startY;
+
+    const angle = Math.atan2(y, x);
+
+    return `${angle}rad`;
+});*/
+
+const gradientId = useUid("linear-gradient");
+const cssStyle = computed(() => `--gradient-id: #${gradientId};`);
+
+const cssClasses = computed(() => ({
+    selected: eitherSelected.value,
+    input: inputSelected.value,
+    output: outputSelected.value,
+}));
+
+const primaryColor = "#25537b";
+const highlightedColor = "#2077b3";
+
+const colorStart = computed(() => (outputSelected.value ? highlightedColor : primaryColor));
+const colorEnd = computed(() => (inputSelected.value ? highlightedColor : primaryColor));
 </script>
 
 <template>
-    <g :id="props.id" class="workflow-editor-drawable-connection">
-        <path
-            v-for="(path, index) in paths"
-            :key="keyForIndex(index)"
-            :class="connectionClass"
-            :d="path"
-            :stroke-width="lineWidth"
-            fill="none">
-        </path>
+    <g>
+        <defs v-if="showGradient">
+            <linearGradient
+                :id="gradientId"
+                :x1="props.terminalPosition?.startX"
+                :x2="props.terminalPosition?.endX"
+                :y1="props.terminalPosition?.startY"
+                :y2="props.terminalPosition?.endY">
+                <stop offset="0%" :stop-color="colorStart" />
+                <stop offset="100%" :stop-color="colorEnd" />
+            </linearGradient>
+        </defs>
+
+        <g :id="props.id" class="workflow-editor-drawable-connection" :class="cssClasses" :style="cssStyle">
+            <path
+                v-for="(path, index) in paths"
+                :key="keyForIndex(index)"
+                :class="connectionClass"
+                :d="path"
+                :stroke="showGradient ? gradientId : undefined"
+                :stroke-width="lineWidth"
+                fill="none">
+            </path>
+        </g>
     </g>
 </template>
 
@@ -245,6 +303,12 @@ function keyForIndex(index: number) {
 
         &.invalid {
             stroke: #{$brand-warning};
+        }
+    }
+
+    &.selected {
+        &.input.output {
+            stroke: #{$brand-info};
         }
     }
 }
