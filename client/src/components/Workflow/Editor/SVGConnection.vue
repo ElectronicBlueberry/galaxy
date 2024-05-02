@@ -2,6 +2,7 @@
 import { curveBasis, line } from "d3";
 import { computed, type PropType } from "vue";
 
+import { useUid } from "@/composables/utils/uid";
 import { useWorkflowStores } from "@/composables/workflowStores";
 import { type Connection, getConnectionId } from "@/stores/workflowConnectionStore";
 import type { TerminalPosition } from "@/stores/workflowEditorStateStore";
@@ -98,6 +99,14 @@ const lineShiftGrowFactorX = 0.15;
 // how much the y distance influences line shift
 const lineShiftGrowFactorY = 0.08;
 
+const forward = computed(() => {
+    if (connectionPosition.value) {
+        return connectionPosition.value.endX >= connectionPosition.value.startX;
+    } else {
+        return true;
+    }
+});
+
 const lineShiftX = computed(() => {
     const position = connectionPosition.value;
 
@@ -108,9 +117,7 @@ const lineShiftX = computed(() => {
     const distanceX = Math.abs(position.endX - position.startX - baseLineShift);
     const distanceY = Math.abs(position.endY - position.startY);
 
-    const forward = position.endX >= position.startX;
-
-    if (forward) {
+    if (forward.value) {
         const growX = distanceX * lineShiftGrowFactorX;
         const growY = distanceY * lineShiftGrowFactorY;
 
@@ -132,13 +139,11 @@ const paths = computed(() => {
         return [];
     }
 
-    const forward = position.endX >= position.startX;
-
     const lines = [...Array(offsets.numOffsets).keys()].map((offsetIndex) => {
         const startOffset = offsets.startOffsets[offsetIndex] || 0;
         const endOffset = offsets.endOffsets[offsetIndex] || 0;
 
-        if (forward) {
+        if (forward.value) {
             return [
                 [position.startX, position.startY + startOffset],
                 [position.startX + lineShiftX.value, position.startY + startOffset],
@@ -216,18 +221,53 @@ function getLineOffsets(inputIsMappedOver?: boolean, outputIsMappedOver?: boolea
 function keyForIndex(index: number) {
     return `${props.id ?? "no-key"}-${index}`;
 }
+
+const outputStepId = computed(() => props.connection.output.stepId);
+const inputStepId = computed(() => props.connection.input.stepId);
+
+const outputSelected = computed(() => stateStore.getStepMultiSelected(outputStepId.value));
+const inputSelected = computed(() => stateStore.getStepMultiSelected(inputStepId.value));
+
+const bothSelected = computed(() => outputSelected.value && inputSelected.value);
+const eitherSelected = computed(() => outputSelected.value || inputSelected.value);
+const showGradient = computed(() => eitherSelected.value && !bothSelected.value);
+
+const gradientId = useUid("linear-gradient");
+const cssStyle = computed(() => `--stroke: url(#${gradientId.value});`);
+
+const cssClasses = computed(() => ({
+    selected: eitherSelected.value,
+    input: inputSelected.value,
+    output: outputSelected.value,
+}));
+
+const primaryColor = "#25537b";
+const highlightedColor = "#58a9e1";
+
+const colorStart = computed(() => (outputSelected.value ? highlightedColor : primaryColor));
+const colorEnd = computed(() => (inputSelected.value ? highlightedColor : primaryColor));
 </script>
 
 <template>
-    <g :id="props.id" class="workflow-editor-drawable-connection">
-        <path
-            v-for="(path, index) in paths"
-            :key="keyForIndex(index)"
-            :class="connectionClass"
-            :d="path"
-            :stroke-width="lineWidth"
-            fill="none">
-        </path>
+    <g>
+        <defs v-if="showGradient">
+            <linearGradient :id="gradientId">
+                <stop offset="0%" :stop-color="forward ? colorStart : colorEnd" />
+                <stop offset="100%" :stop-color="forward ? colorEnd : colorStart" />
+            </linearGradient>
+        </defs>
+
+        <g :id="props.id" class="workflow-editor-drawable-connection" :class="cssClasses" :style="cssStyle">
+            <path
+                v-for="(path, index) in paths"
+                :key="keyForIndex(index)"
+                :class="connectionClass"
+                :d="path"
+                :stroke="showGradient ? `url(#${gradientId})` : undefined"
+                :stroke-width="lineWidth"
+                fill="none">
+            </path>
+        </g>
     </g>
 </template>
 
@@ -246,6 +286,15 @@ function keyForIndex(index: number) {
         &.invalid {
             stroke: #{$brand-warning};
         }
+    }
+
+    &.selected.input .connection,
+    &.selected.output .connection {
+        stroke: var(--stroke);
+    }
+
+    &.selected.input.output .connection {
+        stroke: lighten($brand-info, 20%);
     }
 }
 </style>
