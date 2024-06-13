@@ -1,24 +1,23 @@
-<script setup>
-import Heading from "components/Common/Heading";
-import FormMessage from "components/Form/FormMessage";
-import ToolFooter from "components/Tool/ToolFooter";
-import ToolHelp from "components/Tool/ToolHelp";
-import { getAppRoot } from "onload/loadConfig";
+<script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
 
 import { useStorageLocationConfiguration } from "@/composables/storageLocation";
+import { getAppRoot } from "@/onload/loadConfig";
 import { useConfigStore } from "@/stores/configurationStore";
 import { useUserStore } from "@/stores/userStore";
 
-import ToolSelectPreferredObjectStore from "./ToolSelectPreferredObjectStore";
-import ToolTargetPreferredObjectStorePopover from "./ToolTargetPreferredObjectStorePopover";
-
 import ToolHelpForum from "./ToolHelpForum.vue";
+import ToolSelectPreferredObjectStore from "./ToolSelectPreferredObjectStore.vue";
+import ToolTargetPreferredObjectStorePopover from "./ToolTargetPreferredObjectStorePopover.vue";
 import ToolTutorialRecommendations from "./ToolTutorialRecommendations.vue";
-import ToolFavoriteButton from "components/Tool/Buttons/ToolFavoriteButton.vue";
-import ToolOptionsButton from "components/Tool/Buttons/ToolOptionsButton.vue";
-import ToolVersionsButton from "components/Tool/Buttons/ToolVersionsButton.vue";
+import Heading from "@/components/Common/Heading.vue";
+import FormMessage from "@/components/Form/FormMessage.vue";
+import ToolFavoriteButton from "@/components/Tool/Buttons/ToolFavoriteButton.vue";
+import ToolOptionsButton from "@/components/Tool/Buttons/ToolOptionsButton.vue";
+import ToolVersionsButton from "@/components/Tool/Buttons/ToolVersionsButton.vue";
+import ToolFooter from "@/components/Tool/ToolFooter.vue";
+import ToolHelp from "@/components/Tool/ToolHelp.vue";
 
 const props = defineProps({
     id: {
@@ -65,13 +64,16 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["onChangeVersion", "updatePreferredObjectStoreId"]);
+const emit = defineEmits<{
+    (e: "onChangeVersion", version: string): void;
+    (e: "updatePreferredObjectStoreId", id: string | null): void;
+}>();
 
-function onChangeVersion(v) {
+function onChangeVersion(v: string) {
     emit("onChangeVersion", v);
 }
 
-const errorText = ref(null);
+const errorText = ref<string | null>(null);
 
 watch(
     () => props.id,
@@ -80,7 +82,7 @@ watch(
     }
 );
 
-function onSetError(e) {
+function onSetError(e: string) {
     errorText.value = e;
 }
 
@@ -101,13 +103,13 @@ const storageLocationModalTitle = computed(() => {
 
 const root = computed(() => getAppRoot());
 const showPreferredObjectStoreModal = ref(false);
-const toolPreferredObjectStoreId = ref(props.preferredObjectStoreId);
+const toolPreferredObjectStoreId = ref<string | null>(props.preferredObjectStoreId);
 
 function onShowObjectStoreSelect() {
     showPreferredObjectStoreModal.value = true;
 }
 
-function onUpdatePreferredObjectStoreId(selectedToolPreferredObjectStoreId) {
+function onUpdatePreferredObjectStoreId(selectedToolPreferredObjectStoreId: string | null) {
     showPreferredObjectStoreModal.value = false;
     toolPreferredObjectStoreId.value = selectedToolPreferredObjectStoreId;
     emit("updatePreferredObjectStoreId", selectedToolPreferredObjectStoreId);
@@ -175,7 +177,7 @@ const showHelpForum = computed(() => isConfigLoaded.value && config.value.enable
         </div>
 
         <div id="tool-card-body">
-            <FormMessage variant="danger" :message="errorText" :persistent="true" />
+            <FormMessage variant="danger" :message="errorText ?? undefined" :persistent="true" />
             <FormMessage :variant="props.messageVariant" :message="props.messageText" />
             <slot name="body" />
             <div v-if="props.disabled" class="portlet-backdrop" />
