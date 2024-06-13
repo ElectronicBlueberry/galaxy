@@ -98,7 +98,7 @@
                             @onUpgrade="onUpgrade" />
                     </div>
                 </div>
-                <div ref="right-panel" class="unified-panel-body workflow-right p-2">
+                <div ref="rightPanelElement" class="unified-panel-body workflow-right p-2">
                     <div v-if="!initialLoading">
                         <FormTool
                             v-if="hasActiveNodeTool"
@@ -184,7 +184,7 @@ import { useMagicKeys, whenever } from "@vueuse/core";
 import { logicAnd, logicNot, logicOr } from "@vueuse/math";
 import { Toast } from "composables/toast";
 import { storeToRefs } from "pinia";
-import Vue, { computed, nextTick, onUnmounted, ref, unref } from "vue";
+import Vue, { computed, nextTick, onUnmounted, ref, unref, watch } from "vue";
 
 import { getUntypedWorkflowParameters } from "@/components/Workflow/Editor/modules/parameters";
 import { ConfirmDialog } from "@/composables/confirmDialog";
@@ -272,6 +272,22 @@ export default {
         const id = ref(props.workflowId || uid);
 
         const { connectionStore, stepStore, stateStore, commentStore, undoRedoStore } = provideScopedWorkflowStores(id);
+
+        watch(
+            () => stateStore.activeNodeId,
+            () => {
+                scrollToTop();
+            }
+        );
+
+        const rightPanelElement = ref(null);
+
+        function scrollToTop() {
+            rightPanelElement.value?.scrollTo({
+                top: 0,
+                behavior: "instant",
+            });
+        }
 
         const { undo, redo } = undoRedoStore;
         const { ctrl_z, ctrl_shift_z, meta_z, meta_shift_z } = useMagicKeys();
@@ -411,6 +427,8 @@ export default {
 
         return {
             id,
+            rightPanelElement,
+            scrollToTop,
             name,
             isCanvas,
             parameters,
@@ -911,9 +929,6 @@ export default {
                 this.hasChanges = true;
                 this.setCreator(creator);
             }
-        },
-        onActiveNode(nodeId) {
-            this.$refs["right-panel"].scrollTop = 0;
         },
         onInsertedStateMessages(insertedStateMessages) {
             this.insertedStateMessages = insertedStateMessages;
