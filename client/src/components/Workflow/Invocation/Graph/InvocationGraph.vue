@@ -92,9 +92,10 @@ const { steps, storeId, loadInvocationGraph } = useInvocationGraph(
 // Equivalent to onMounted; this is where the graph is initialized, and the polling is started
 watch(
     () => workflowId.value,
-    async (wfId) => {
+    (wfId) => {
         if (wfId) {
-            await pollInvocationGraph();
+            clearTimeout(pollTimeout.value);
+            pollInvocationGraph();
         }
     },
     { immediate: true }
