@@ -175,7 +175,6 @@ function getStepText(steps: number) {
 
 .workflow-indicators {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
 }
 
