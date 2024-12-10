@@ -446,7 +446,7 @@ export default {
             emit("update:confirmation", false);
         });
 
-        const stepActions = useStepActions(stepStore, undoRedoStore, stateStore, connectionStore);
+        const stepActions = useStepActions(id.value);
 
         const markdownEditor = ref(null);
         function insertMarkdown(markdown) {
@@ -936,24 +936,29 @@ export default {
             this.undoRedoStore.applyAction(action);
             const stepData = action.getNewStepData();
 
-            const response = await getModule(
-                { name, type, content_id: contentId, tool_state: state },
-                stepData.id,
-                this.stateStore.setLoadingState
-            );
+            try {
+                const response = await getModule(
+                    { name, type, content_id: contentId, tool_state: state },
+                    stepData.id,
+                    this.stateStore.setLoadingState
+                );
 
-            const updatedStep = {
-                ...stepData,
-                tool_state: response.tool_state,
-                inputs: response.inputs,
-                outputs: response.outputs,
-                config_form: response.config_form,
-            };
+                const updatedStep = {
+                    ...stepData,
+                    tool_state: response.tool_state,
+                    inputs: response.inputs,
+                    outputs: response.outputs,
+                    config_form: response.config_form,
+                };
 
-            this.stepStore.updateStep(updatedStep);
-            action.updateStepData = updatedStep;
+                this.stepStore.updateStep(updatedStep);
+                action.updateStepData = updatedStep;
 
-            this.stateStore.activeNodeId = stepData.id;
+                this.stateStore.activeNodeId = stepData.id;
+            } catch (e) {
+                console.error(e);
+                action.hasErrors = true;
+            }
         },
         async _loadEditorData(data) {
             if (data.name !== undefined) {

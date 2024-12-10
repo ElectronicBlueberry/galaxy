@@ -1,14 +1,15 @@
 import { replaceLabel } from "@/components/Markdown/parse";
 import { useToast } from "@/composables/toast";
 import { useRefreshFromStore } from "@/stores/refreshFromStore";
-import { LazyUndoRedoAction, UndoRedoAction, type UndoRedoStore } from "@/stores/undoRedoStore";
-import { type Connection, type WorkflowConnectionStore } from "@/stores/workflowConnectionStore";
+import { LazyUndoRedoAction, UndoRedoAction, useUndoRedoStore } from "@/stores/undoRedoStore";
+import { type Connection, useConnectionStore, type WorkflowConnectionStore } from "@/stores/workflowConnectionStore";
 import { useWorkflowCommentStore } from "@/stores/workflowEditorCommentStore";
-import { type WorkflowStateStore } from "@/stores/workflowEditorStateStore";
+import { useWorkflowStateStore, type WorkflowStateStore } from "@/stores/workflowEditorStateStore";
 import { type NewStep, type Step, useWorkflowStepStore, type WorkflowStepStore } from "@/stores/workflowStepStore";
 import { assertDefined } from "@/utils/assertions";
 
 import { cloneStepWithUniqueLabel, getLabelSet } from "./cloneStep";
+import { ErrorAwareAction } from "./errorAwareAction";
 
 export class LazyMutateStepAction<K extends keyof Step> extends LazyUndoRedoAction {
     key: K;
@@ -163,7 +164,7 @@ export class LazySetOutputLabelAction extends LazyMutateStepAction<"workflow_out
     }
 }
 
-export class UpdateStepAction extends UndoRedoAction {
+export class UpdateStepAction extends ErrorAwareAction {
     stepStore;
     stateStore;
     stepId;
@@ -180,16 +181,10 @@ export class UpdateStepAction extends UndoRedoAction {
         this.internalName = name;
     }
 
-    constructor(
-        stepStore: WorkflowStepStore,
-        stateStore: WorkflowStateStore,
-        stepId: number,
-        fromPartial: Partial<Step>,
-        toPartial: Partial<Step>
-    ) {
-        super();
-        this.stepStore = stepStore;
-        this.stateStore = stateStore;
+    constructor(workflowId: string, stepId: number, fromPartial: Partial<Step>, toPartial: Partial<Step>) {
+        super(workflowId);
+        this.stepStore = useWorkflowStepStore(workflowId);
+        this.stateStore = useWorkflowStateStore(workflowId);
         this.stepId = stepId;
         this.fromPartial = fromPartial;
         this.toPartial = toPartial;
@@ -226,7 +221,7 @@ export class UpdateStepAction extends UndoRedoAction {
 }
 
 export class SetDataAction extends UpdateStepAction {
-    constructor(stepStore: WorkflowStepStore, stateStore: WorkflowStateStore, from: Step, to: Step) {
+    constructor(workflowId: string, from: Step, to: Step) {
         const fromPartial: Partial<Step> = {};
         const toPartial: Partial<Step> = {};
 
@@ -239,7 +234,7 @@ export class SetDataAction extends UpdateStepAction {
             }
         });
 
-        super(stepStore, stateStore, from.id, fromPartial, toPartial);
+        super(workflowId, from.id, fromPartial, toPartial);
     }
 }
 
@@ -514,12 +509,12 @@ export class AutoLayoutAction extends UndoRedoAction {
     }
 }
 
-export function useStepActions(
-    stepStore: WorkflowStepStore,
-    undoRedoStore: UndoRedoStore,
-    stateStore: WorkflowStateStore,
-    connectionStore: WorkflowConnectionStore
-) {
+export function useStepActions(workflowId: string) {
+    const undoRedoStore = useUndoRedoStore(workflowId);
+    const stepStore = useWorkflowStepStore(workflowId);
+    const stateStore = useWorkflowStateStore(workflowId);
+    const connectionStore = useConnectionStore(workflowId);
+
     /**
      * If the pending action is a `LazyMutateStepAction` and matches the step id and field key, returns it.
      * Otherwise returns `null`
@@ -641,7 +636,11 @@ export function useStepActions(
     const { refresh } = useRefreshFromStore();
 
     function setData(from: Step, to: Step) {
-        const action = new SetDataAction(stepStore, stateStore, from, to);
+        const action = new SetDataAction(workflowId, from, to);
+
+        if ((from.errors?.length ?? 0) > (to.errors?.length ?? 0)) {
+            action.hasErrors = true;
+        }
 
         if (!action.isEmpty()) {
             action.onUndoRedo = () => {
@@ -666,7 +665,11 @@ export function useStepActions(
             fromPartial[key as keyof Step] = structuredClone(fromStep[key as keyof Step]) as any;
         });
 
-        const action = new UpdateStepAction(stepStore, stateStore, id, fromPartial, toPartial);
+        const action = new UpdateStepAction(workflowId, id, fromPartial, toPartial);
+
+        if ((fromPartial.errors?.length ?? 0) > (toPartial.errors?.length ?? 0)) {
+            action.hasErrors = true;
+        }
 
         if (!action.isEmpty()) {
             action.onUndoRedo = () => {

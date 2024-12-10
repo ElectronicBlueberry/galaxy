@@ -39,6 +39,7 @@ function updateSavedUndoActions() {
                 v-for="action in currentStore.redoActionStack"
                 :key="action.id"
                 class="action future"
+                :class="{ error: action.hasErrors }"
                 @click="currentStore.rollForwardTo(action)">
                 {{ action.name }}
             </button>
@@ -53,6 +54,7 @@ function updateSavedUndoActions() {
                 v-for="action in [...currentStore.undoActionStack].reverse()"
                 :key="action.id"
                 class="action past"
+                :class="{ error: action.hasErrors }"
                 @click="currentStore.rollBackTo(action)">
                 {{ action.name }}
             </button>
@@ -152,6 +154,10 @@ function updateSavedUndoActions() {
         &::before {
             background-color: $text-light;
         }
+    }
+
+    &.error {
+        background-color: lighten($brand-danger, 30%);
     }
 
     &.dead {

@@ -242,8 +242,7 @@ describe("Workflow Undo Redo Actions", () => {
         it("UpdateStepAction", () => {
             const step = addStep();
             const action = new UpdateStepAction(
-                stepStore,
-                stateStore,
+                workflowId,
                 step.id,
                 {
                     outputs: step.outputs,

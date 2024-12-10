@@ -12,6 +12,7 @@ import { ensureDefined } from "@/utils/assertions";
 import { type defaultPosition } from "../composables/useDefaultStepPosition";
 import { fromSimple, type Workflow } from "../modules/model";
 import { cloneStepWithUniqueLabel, getLabelSet } from "./cloneStep";
+import { ErrorAwareAction } from "./errorAwareAction";
 
 export class LazySetValueAction<T> extends LazyUndoRedoAction {
     setValueHandler;
@@ -85,7 +86,7 @@ export class SetValueActionHandler<T> {
     }
 }
 
-export class CopyIntoWorkflowAction extends UndoRedoAction {
+export class CopyIntoWorkflowAction extends ErrorAwareAction {
     workflowId;
     data;
     newCommentIds: number[] = [];
@@ -101,7 +102,7 @@ export class CopyIntoWorkflowAction extends UndoRedoAction {
         data: Pick<Workflow, "steps" | "comments" | "name">,
         position: ReturnType<typeof defaultPosition>
     ) {
-        super();
+        super(workflowId);
 
         this.workflowId = workflowId;
         this.data = structuredClone(data);
@@ -360,14 +361,14 @@ export class DuplicateSelectionAction extends CopyIntoWorkflowAction {
     }
 }
 
-export class DeleteSelectionAction extends UndoRedoAction {
+export class DeleteSelectionAction extends ErrorAwareAction {
     storedSelectionAction: DuplicateSelectionAction;
     stateStore;
     connectionStore;
     storedConnections;
 
     constructor(workflowId: string) {
-        super();
+        super(workflowId);
 
         this.stateStore = useWorkflowStateStore(workflowId);
         this.connectionStore = useConnectionStore(workflowId);

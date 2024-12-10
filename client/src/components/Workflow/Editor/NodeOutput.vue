@@ -65,7 +65,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["pan-by", "stopDragging", "onDragConnector"]);
-const { stateStore, stepStore, undoRedoStore } = useWorkflowStores();
+const { stateStore, stepStore, undoRedoStore, workflowId } = useWorkflowStores();
 const { rootOffset, output, stepId, datatypesMapper } = toRefs(props);
 
 const terminalComponent: Ref<InstanceType<typeof DraggableWrapper> | null> = ref(null);
@@ -169,8 +169,7 @@ function onToggleActive() {
     }
 
     const action = new UpdateStepAction(
-        stepStore,
-        stateStore,
+        workflowId,
         step.id,
         { workflow_outputs: step.workflow_outputs },
         { workflow_outputs: stepWorkflowOutputs }
@@ -207,8 +206,7 @@ function onToggleVisible() {
     }
 
     const action = new UpdateStepAction(
-        stepStore,
-        stateStore,
+        workflowId,
         step.id,
         { post_job_actions: oldPostJobActions },
         { post_job_actions: newPostJobActions }
