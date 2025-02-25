@@ -171,6 +171,7 @@ export type HDAObject = components["schemas"]["HDAObject"];
 export type DatasetCollectionAttributes = components["schemas"]["DatasetCollectionAttributesResult"];
 
 export type ConcreteObjectStoreModel = components["schemas"]["ConcreteObjectStoreModel"];
+export type UserConcreteObjectStoreModel = components["schemas"]["UserConcreteObjectStoreModel"];
 
 /**
  * A SubCollection is a DatasetCollectionElement of type `dataset_collection`
