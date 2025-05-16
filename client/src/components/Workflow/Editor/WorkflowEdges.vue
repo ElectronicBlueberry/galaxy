@@ -9,11 +9,13 @@ import type { Connection, OutputTerminal } from "@/stores/workflowStoreTypes";
 import type { OutputTerminals } from "./modules/terminals";
 
 import SVGConnection from "./SVGConnection.vue";
+import SvgWrapper from "@/components/Workflow/Editor/ConvergentComponents/SvgWrapper.vue";
 
 const props = defineProps<{
     draggingConnection: TerminalPosition | null;
     draggingTerminal: OutputTerminals | null;
     transform: { x: number; y: number; k: number };
+    renderSvg: boolean;
 }>();
 
 const { connectionStore } = useWorkflowStores();
@@ -46,31 +48,21 @@ function id(connection: Connection) {
 </script>
 
 <template>
-    <div class="workflow-edges">
-        <svg class="workflow-edges">
-            <SVGConnection
-                v-if="draggingConnection"
-                :connection="draggingConnection[0]"
-                :terminal-position="draggingConnection[1]" />
-            <SVGConnection
-                v-for="connection in connections"
-                :id="id(connection)"
-                :key="key(connection)"
-                :connection="connection" />
-        </svg>
-    </div>
+    <SvgWrapper :svg="props.renderSvg" class="workflow-edges">
+        <SVGConnection
+            v-if="draggingConnection"
+            :connection="draggingConnection[0]"
+            :terminal-position="draggingConnection[1]" />
+        <SVGConnection
+            v-for="connection in connections"
+            :id="id(connection)"
+            :key="key(connection)"
+            :connection="connection" />
+    </SvgWrapper>
 </template>
 
 <style lang="scss" scoped>
 .workflow-edges {
-    display: block;
-    overflow: visible;
-    height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    position: absolute;
-    transform-origin: 0 0;
     z-index: 80;
     pointer-events: none;
 }

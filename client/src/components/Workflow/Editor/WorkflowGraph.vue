@@ -184,6 +184,7 @@ defineExpose({
                 <InputCatcher v-if="!props.renderSvg" :transform="transform" />
                 <BoxSelectPreview v-if="!props.renderSvg" />
                 <WorkflowEdges
+                    :render-svg="props.renderSvg"
                     :transform="transform"
                     :dragging-terminal="draggingTerminal"
                     :dragging-connection="draggingPosition" />
