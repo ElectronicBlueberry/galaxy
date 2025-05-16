@@ -10,8 +10,16 @@ const props = defineProps<{
     };
 }>();
 
+const unit = computed(() => {
+    if (props.svg) {
+        return "";
+    } else {
+        return "px";
+    }
+});
+
 const transformString = computed(() => {
-    return `translate(${props.transform.x}px, ${props.transform.y}px) scale(${props.transform.k})`;
+    return `translate(${props.transform.x}${unit.value}, ${props.transform.y}${unit.value}) scale(${props.transform.k})`;
 });
 </script>
 
