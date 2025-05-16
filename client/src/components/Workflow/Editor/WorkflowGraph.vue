@@ -172,9 +172,7 @@ defineExpose({
             id="canvas-container"
             ref="canvas"
             :svg="props.renderSvg"
-            :style="{ height: props.fixedHeight ? `${props.fixedHeight}vh` : '100%' }"
-            @drop.prevent
-            @dragover.prevent>
+            :style="{ height: props.fixedHeight ? `${props.fixedHeight}vh` : '100%' }">
             <AdaptiveGrid
                 v-if="!props.renderSvg"
                 :viewport-bounds="elementBounding"

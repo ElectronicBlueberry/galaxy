@@ -14,7 +14,7 @@ const props = defineProps<{
         role="img">
         <slot></slot>
     </svg>
-    <div v-else class="canvas-content">
+    <div v-else class="canvas-content" @drop.prevent @dragover.prevent>
         <slot></slot>
     </div>
 </template>
