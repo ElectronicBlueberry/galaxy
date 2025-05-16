@@ -9,7 +9,7 @@ const props = defineProps<{
 <template>
     <svg
         v-if="props.svg"
-        :view-box="`0 0 ${props.width ?? 600} ${props.height ?? 400}`"
+        :viewBox="`0 0 ${props.width ?? 600} ${props.height ?? 400}`"
         preserveAspectRatio="xMidYMid slice"
         role="img">
         <slot></slot>
