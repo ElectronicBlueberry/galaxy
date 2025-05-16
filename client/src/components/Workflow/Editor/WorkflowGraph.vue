@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { computed, type PropType, provide, reactive, type Ref, ref, watch, watchEffect } from "vue";
 
 import { DatatypesMapperModel } from "@/components/Datatypes/model";
+import { useResolveElement } from "@/composables/resolveElement";
 import { useWorkflowStores } from "@/composables/workflowStores";
 import type { TerminalPosition, XYPosition } from "@/stores/workflowEditorStateStore";
 import type { Step } from "@/stores/workflowStepStore";
@@ -21,6 +22,7 @@ import WorkflowComment from "./Comments/WorkflowComment.vue";
 import BoxSelectPreview from "./Tools/BoxSelectPreview.vue";
 import InputCatcher from "./Tools/InputCatcher.vue";
 import ToolBar from "./Tools/ToolBar.vue";
+import CanvasContainer from "@/components/Workflow/Editor/ConvergentComponents/CanvasContainer.vue";
 import WorkflowNode from "@/components/Workflow/Editor/Node.vue";
 import WorkflowEdges from "@/components/Workflow/Editor/WorkflowEdges.vue";
 import WorkflowMinimap from "@/components/Workflow/Editor/WorkflowMinimap.vue";
@@ -39,19 +41,21 @@ const props = defineProps({
     showZoomControls: { type: Boolean, default: true },
     fixedHeight: { type: Number, default: undefined },
     populatedInputs: { type: Boolean, default: false },
+    renderSvg: { type: Boolean, default: false },
 });
 
 const { stateStore, stepStore } = useWorkflowStores();
 const { scale, activeNodeId, draggingPosition, draggingTerminal } = storeToRefs(stateStore);
 const canvas: Ref<HTMLElement | null> = ref(null);
+const canvasElement = useResolveElement(canvas);
 
-const elementBounding = useElementBounding(canvas, { windowResize: false, windowScroll: false });
-const scroll = useScroll(canvas);
+const elementBounding = useElementBounding(canvasElement, { windowResize: false, windowScroll: false });
+const scroll = useScroll(canvasElement);
 const { transform, panBy, setZoom, moveTo } = useD3Zoom(
     scale.value,
     minZoom,
     maxZoom,
-    canvas,
+    canvasElement,
     scroll,
     props.initialPosition
 );
@@ -167,20 +171,21 @@ defineExpose({
             @onZoom="zoomTo"
             @update:pan="panBy" />
         <ToolBar v-if="!readonly" />
-        <div
+        <CanvasContainer
             id="canvas-container"
             ref="canvas"
-            class="canvas-content"
+            :svg="props.renderSvg"
             :style="{ height: props.fixedHeight ? `${props.fixedHeight}vh` : '100%' }"
             @drop.prevent
             @dragover.prevent>
             <AdaptiveGrid
+                v-if="!props.renderSvg"
                 :viewport-bounds="elementBounding"
                 :viewport-bounding-box="viewportBoundingBox"
                 :transform="transform" />
             <div class="node-area" :style="canvasStyle">
-                <InputCatcher :transform="transform" />
-                <BoxSelectPreview />
+                <InputCatcher v-if="!props.renderSvg" :transform="transform" />
+                <BoxSelectPreview v-if="!props.renderSvg" />
                 <WorkflowEdges
                     :transform="transform"
                     :dragging-terminal="draggingTerminal"
@@ -216,7 +221,7 @@ defineExpose({
                     :root-offset="elementBounding"
                     @pan-by="panBy" />
             </div>
-        </div>
+        </CanvasContainer>
         <WorkflowMinimap
             v-if="elementBounding && props.showMinimap"
             :steps="steps"
@@ -232,14 +237,6 @@ defineExpose({
 <style scoped land="scss">
 .workflow-canvas {
     position: relative;
-
-    .canvas-content {
-        width: 100%;
-        position: relative;
-        left: 0px;
-        top: 0px;
-        overflow: hidden;
-    }
 
     .node-area {
         position: absolute;
