@@ -280,6 +280,8 @@ function autoLayout() {
                     @click="autoLayout">
                     <Workflow />
                 </GButton>
+
+                <GButton outline color="blue" class="button" :pressed.sync="toolbarStore.renderSvg"> S </GButton>
             </template>
 
             <GButton

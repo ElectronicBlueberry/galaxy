@@ -100,6 +100,9 @@ export const useWorkflowEditorToolbarStore = defineScopedStore("workflowEditorTo
         });
     }
 
+    /** temporary testing flag. TOTO: remove me */
+    const renderSvg = ref(false);
+
     return {
         toolbarVisible,
         snapActive,
@@ -115,5 +118,6 @@ export const useWorkflowEditorToolbarStore = defineScopedStore("workflowEditorTo
         boxSelectMode,
         boxSelectRect,
         resetBoxSelect,
+        renderSvg,
     };
 });

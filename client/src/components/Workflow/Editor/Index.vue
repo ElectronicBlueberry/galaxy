@@ -187,6 +187,7 @@
                     :highlight-id="highlightId"
                     :scroll-to-id="scrollToId"
                     :initial-position="{ x: 50, y: 50 }"
+                    :render-svg="toolbarStore.renderSvg"
                     @scrollTo="scrollToId = null"
                     @transform="(value) => (transform = value)"
                     @graph-offset="(value) => (graphOffset = value)"
@@ -315,7 +316,8 @@ export default {
         const uid = unref(useUid("workflow-editor-"));
         const id = ref(props.workflowId || uid);
 
-        const { connectionStore, stepStore, stateStore, commentStore, undoRedoStore } = provideScopedWorkflowStores(id);
+        const { connectionStore, stepStore, stateStore, commentStore, undoRedoStore, toolbarStore } =
+            provideScopedWorkflowStores(id);
 
         const { undo, redo } = undoRedoStore;
         const { ctrl_z, ctrl_shift_z, meta_z, meta_shift_z } = useMagicKeys();
@@ -640,6 +642,7 @@ export default {
             confirm,
             inputs,
             workflowActivities,
+            toolbarStore,
         };
     },
     data() {
