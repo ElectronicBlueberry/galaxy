@@ -10,24 +10,19 @@ const props = defineProps<{
     };
 }>();
 
-const unit = computed(() => {
-    if (props.svg) {
-        return "";
-    } else {
-        return "px";
-    }
-});
-
-const transformString = computed(() => {
-    return `translate(${props.transform.x}${unit.value}, ${props.transform.y}${unit.value}) scale(${props.transform.k})`;
+const transformStyle = computed(() => {
+    return {
+        transform: `translate(${props.transform.x}px, ${props.transform.y}px) scale(${props.transform.k})`,
+        "transform-origin": "0 0",
+    };
 });
 </script>
 
 <template>
-    <g v-if="props.svg" :transform="transformString">
+    <g v-if="props.svg" :style="transformStyle">
         <slot></slot>
     </g>
-    <div v-else :style="`transform: ${transformString};`">
+    <div v-else :style="transformStyle">
         <slot></slot>
     </div>
 </template>
@@ -39,6 +34,5 @@ const transformString = computed(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    transform-origin: 0 0;
 }
 </style>
