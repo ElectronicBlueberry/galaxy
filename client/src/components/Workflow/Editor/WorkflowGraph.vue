@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElementBounding, useScroll } from "@vueuse/core";
 import { storeToRefs } from "pinia";
-import { computed, type PropType, provide, reactive, type Ref, ref, watch, watchEffect } from "vue";
+import { type PropType, provide, reactive, type Ref, ref, watch, watchEffect } from "vue";
 
 import { DatatypesMapperModel } from "@/components/Datatypes/model";
 import { useResolveElement } from "@/composables/resolveElement";
@@ -23,6 +23,7 @@ import BoxSelectPreview from "./Tools/BoxSelectPreview.vue";
 import InputCatcher from "./Tools/InputCatcher.vue";
 import ToolBar from "./Tools/ToolBar.vue";
 import CanvasContainer from "@/components/Workflow/Editor/ConvergentComponents/CanvasContainer.vue";
+import NodeArea from "@/components/Workflow/Editor/ConvergentComponents/NodeArea.vue";
 import WorkflowNode from "@/components/Workflow/Editor/Node.vue";
 import WorkflowEdges from "@/components/Workflow/Editor/WorkflowEdges.vue";
 import WorkflowMinimap from "@/components/Workflow/Editor/WorkflowMinimap.vue";
@@ -148,10 +149,6 @@ watchEffect(() => {
     emit("graph-offset", reactive(elementBounding));
 });
 
-const canvasStyle = computed(() => {
-    return { transform: `translate(${transform.value.x}px, ${transform.value.y}px) scale(${transform.value.k})` };
-});
-
 const { commentStore } = useWorkflowStores();
 const { comments } = storeToRefs(commentStore);
 
@@ -183,7 +180,7 @@ defineExpose({
                 :viewport-bounds="elementBounding"
                 :viewport-bounding-box="viewportBoundingBox"
                 :transform="transform" />
-            <div class="node-area" :style="canvasStyle">
+            <NodeArea :svg="props.renderSvg" :transform="transform">
                 <InputCatcher v-if="!props.renderSvg" :transform="transform" />
                 <BoxSelectPreview v-if="!props.renderSvg" />
                 <WorkflowEdges
@@ -220,7 +217,7 @@ defineExpose({
                     :readonly="readonly"
                     :root-offset="elementBounding"
                     @pan-by="panBy" />
-            </div>
+            </NodeArea>
         </CanvasContainer>
         <WorkflowMinimap
             v-if="elementBounding && props.showMinimap"
@@ -234,17 +231,8 @@ defineExpose({
     </div>
 </template>
 
-<style scoped land="scss">
+<style scoped>
 .workflow-canvas {
     position: relative;
-
-    .node-area {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        transform-origin: 0 0;
-    }
 }
 </style>
