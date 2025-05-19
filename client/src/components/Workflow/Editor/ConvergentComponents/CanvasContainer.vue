@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { RenderState } from "@/components/Workflow/Editor/ConvergentComponents/useRenderController";
+
 const props = defineProps<{
-    svg: boolean;
+    renderState: RenderState;
     width?: number;
     height?: number;
 }>();
@@ -8,7 +10,7 @@ const props = defineProps<{
 
 <template>
     <svg
-        v-if="props.svg"
+        v-if="props.renderState === 'svg'"
         :viewBox="`0 0 ${props.width ?? 600} ${props.height ?? 400}`"
         preserveAspectRatio="xMidYMid slice"
         role="img">

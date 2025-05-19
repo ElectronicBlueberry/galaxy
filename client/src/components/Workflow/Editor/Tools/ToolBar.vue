@@ -281,7 +281,18 @@ function autoLayout() {
                     <Workflow />
                 </GButton>
 
-                <GButton outline color="blue" class="button" :pressed.sync="toolbarStore.renderSvg"> S </GButton>
+                <GButton
+                    outline
+                    color="blue"
+                    class="button"
+                    :pressed="toolbarStore.renderState === 'svg'"
+                    @click="
+                        toolbarStore.renderState === 'html'
+                            ? (toolbarStore.renderState = 'svg')
+                            : (toolbarStore.renderState = 'html')
+                    ">
+                    S
+                </GButton>
             </template>
 
             <GButton

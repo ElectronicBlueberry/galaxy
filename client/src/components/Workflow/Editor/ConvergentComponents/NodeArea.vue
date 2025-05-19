@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import type { RenderState } from "@/components/Workflow/Editor/ConvergentComponents/useRenderController";
+
 const props = defineProps<{
-    svg: boolean;
+    renderState: RenderState;
     transform: {
         x: number;
         y: number;
@@ -19,7 +21,7 @@ const transformStyle = computed(() => {
 </script>
 
 <template>
-    <g v-if="props.svg" :style="transformStyle">
+    <g v-if="props.renderState === 'svg'" :style="transformStyle">
         <slot></slot>
     </g>
     <div v-else :style="transformStyle">

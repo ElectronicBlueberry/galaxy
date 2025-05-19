@@ -2,6 +2,7 @@
 import { storeToRefs } from "pinia";
 import { computed, type Ref } from "vue";
 
+import type { RenderState } from "@/components/Workflow/Editor/ConvergentComponents/useRenderController";
 import { useWorkflowStores } from "@/composables/workflowStores";
 import type { TerminalPosition } from "@/stores/workflowEditorStateStore";
 import type { Connection, OutputTerminal } from "@/stores/workflowStoreTypes";
@@ -15,7 +16,7 @@ const props = defineProps<{
     draggingConnection: TerminalPosition | null;
     draggingTerminal: OutputTerminals | null;
     transform: { x: number; y: number; k: number };
-    renderSvg: boolean;
+    renderState: RenderState;
 }>();
 
 const { connectionStore } = useWorkflowStores();
@@ -48,7 +49,7 @@ function id(connection: Connection) {
 </script>
 
 <template>
-    <SvgWrapper :svg="props.renderSvg" class="workflow-edges">
+    <SvgWrapper :render-state="props.renderState" class="workflow-edges">
         <SVGConnection
             v-if="draggingConnection"
             :connection="draggingConnection[0]"

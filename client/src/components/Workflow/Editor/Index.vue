@@ -187,7 +187,7 @@
                     :highlight-id="highlightId"
                     :scroll-to-id="scrollToId"
                     :initial-position="{ x: 50, y: 50 }"
-                    :render-svg="toolbarStore.renderSvg"
+                    :render-state="toolbarStore.renderState"
                     @scrollTo="scrollToId = null"
                     @transform="(value) => (transform = value)"
                     @graph-offset="(value) => (graphOffset = value)"

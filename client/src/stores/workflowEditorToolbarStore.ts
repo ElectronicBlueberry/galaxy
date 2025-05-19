@@ -1,5 +1,6 @@
 import { computed, getCurrentScope, onScopeDispose, reactive, ref, watch } from "vue";
 
+import { useRenderController } from "@/components/Workflow/Editor/ConvergentComponents/useRenderController";
 import { type Rectangle } from "@/components/Workflow/Editor/modules/geometry";
 import { useMagicKeys } from "@/composables/useMagicKeys";
 import { useUserLocalStorage } from "@/composables/userLocalStorage";
@@ -100,8 +101,7 @@ export const useWorkflowEditorToolbarStore = defineScopedStore("workflowEditorTo
         });
     }
 
-    /** temporary testing flag. TOTO: remove me */
-    const renderSvg = ref(false);
+    const { renderState } = useRenderController();
 
     return {
         toolbarVisible,
@@ -118,6 +118,6 @@ export const useWorkflowEditorToolbarStore = defineScopedStore("workflowEditorTo
         boxSelectMode,
         boxSelectRect,
         resetBoxSelect,
-        renderSvg,
+        renderState,
     };
 });

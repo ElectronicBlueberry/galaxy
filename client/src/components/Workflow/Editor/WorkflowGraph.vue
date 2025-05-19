@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { type PropType, provide, reactive, type Ref, ref, watch, watchEffect } from "vue";
 
 import { DatatypesMapperModel } from "@/components/Datatypes/model";
+import { type RenderState } from "@/components/Workflow/Editor/ConvergentComponents/useRenderController";
 import { useResolveElement } from "@/composables/resolveElement";
 import { useWorkflowStores } from "@/composables/workflowStores";
 import type { TerminalPosition, XYPosition } from "@/stores/workflowEditorStateStore";
@@ -42,7 +43,7 @@ const props = defineProps({
     showZoomControls: { type: Boolean, default: true },
     fixedHeight: { type: Number, default: undefined },
     populatedInputs: { type: Boolean, default: false },
-    renderSvg: { type: Boolean, default: false },
+    renderState: { type: String as PropType<RenderState>, default: "html" },
 });
 
 const { stateStore, stepStore } = useWorkflowStores();
@@ -171,18 +172,18 @@ defineExpose({
         <CanvasContainer
             id="canvas-container"
             ref="canvas"
-            :svg="props.renderSvg"
+            :render-state="props.renderState"
             :style="{ height: props.fixedHeight ? `${props.fixedHeight}vh` : '100%' }">
             <AdaptiveGrid
-                v-if="!props.renderSvg"
+                v-if="props.renderState === 'html'"
                 :viewport-bounds="elementBounding"
                 :viewport-bounding-box="viewportBoundingBox"
                 :transform="transform" />
-            <NodeArea :svg="props.renderSvg" :transform="transform">
-                <InputCatcher v-if="!props.renderSvg" :transform="transform" />
-                <BoxSelectPreview v-if="!props.renderSvg" />
+            <NodeArea :render-state="props.renderState" :transform="transform">
+                <InputCatcher v-if="props.renderState === 'html'" :transform="transform" />
+                <BoxSelectPreview v-if="props.renderState === 'html'" />
                 <WorkflowEdges
-                    :render-svg="props.renderSvg"
+                    :render-state="props.renderState"
                     :transform="transform"
                     :dragging-terminal="draggingTerminal"
                     :dragging-connection="draggingPosition" />

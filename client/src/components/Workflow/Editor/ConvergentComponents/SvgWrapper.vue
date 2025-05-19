@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import type { RenderState } from "@/components/Workflow/Editor/ConvergentComponents/useRenderController";
+
 /** Provides a svg context in html, and a group in svg */
 const props = defineProps<{
-    svg: boolean;
+    renderState: RenderState;
 }>();
 </script>
 
 <template>
-    <g v-if="props.svg">
+    <g v-if="props.renderState === 'svg'">
         <slot></slot>
     </g>
     <svg v-else class="wrapper">
