@@ -2,6 +2,8 @@
 import { curveBasis, line } from "d3";
 import { computed, type PropType } from "vue";
 
+import { useDataFreeze } from "@/components/Workflow/Editor/ConvergentComponents/useDataFreeze";
+import type { RenderState } from "@/components/Workflow/Editor/ConvergentComponents/useRenderController";
 import { useWorkflowStores } from "@/composables/workflowStores";
 import { getConnectionId } from "@/stores/workflowConnectionStore";
 import type { TerminalPosition } from "@/stores/workflowEditorStateStore";
@@ -16,6 +18,10 @@ const props = defineProps({
     terminalPosition: {
         type: Object as PropType<TerminalPosition | null>,
         default: null,
+    },
+    renderState: {
+        type: String as PropType<RenderState>,
+        default: "html",
     },
 });
 
@@ -87,6 +93,38 @@ const outputIsOptional = computed(() => {
 const connectionIsValid = computed(() => {
     return !connectionStore.invalidConnections[getConnectionId(props.connection)];
 });
+
+function generateLineOffsets(inputIsMappedOver: boolean, outputIsMappedOver: boolean) {
+    const offsets = [-2 * ribbonMargin, -ribbonMargin, 0, ribbonMargin, 2 * ribbonMargin];
+    let startOffsets = [0];
+    let endOffsets = [0];
+    let numOffsets = 1;
+
+    if (outputIsMappedOver) {
+        startOffsets = offsets;
+        numOffsets = offsets.length;
+    }
+    if (inputIsMappedOver) {
+        endOffsets = offsets;
+        numOffsets = offsets.length;
+    }
+    return { numOffsets, startOffsets, endOffsets };
+}
+
+const lineOffsetDictionary = {
+    "false-false": generateLineOffsets(false, false),
+    "true-false": generateLineOffsets(true, false),
+    "false-true": generateLineOffsets(false, true),
+    "true-true": generateLineOffsets(true, true),
+} as const;
+
+function getLineOffsets(inputIsMappedOver?: boolean, outputIsMappedOver?: boolean) {
+    return lineOffsetDictionary[`${inputIsMappedOver ?? false}-${outputIsMappedOver ?? false}`];
+}
+
+function keyForIndex(index: number) {
+    return `${props.id ?? "no-key"}-${index}`;
+}
 
 const lineOffsets = computed(() => getLineOffsets(inputIsMappedOver.value, outputIsMappedOver.value));
 
@@ -164,6 +202,8 @@ const paths = computed(() => {
     return lines.map((l) => curve(l)!);
 });
 
+const maybeFrozenPaths = useDataFreeze(() => props.renderState, `${props.id}-paths`, paths);
+
 const lineWidth = computed(() => {
     if (inputIsMappedOver.value || outputIsMappedOver.value) {
         return 2;
@@ -185,44 +225,12 @@ const connectionClass = computed(() => {
 
     return classList.join(" ");
 });
-
-function generateLineOffsets(inputIsMappedOver: boolean, outputIsMappedOver: boolean) {
-    const offsets = [-2 * ribbonMargin, -ribbonMargin, 0, ribbonMargin, 2 * ribbonMargin];
-    let startOffsets = [0];
-    let endOffsets = [0];
-    let numOffsets = 1;
-
-    if (outputIsMappedOver) {
-        startOffsets = offsets;
-        numOffsets = offsets.length;
-    }
-    if (inputIsMappedOver) {
-        endOffsets = offsets;
-        numOffsets = offsets.length;
-    }
-    return { numOffsets, startOffsets, endOffsets };
-}
-
-const lineOffsetDictionary = {
-    "false-false": generateLineOffsets(false, false),
-    "true-false": generateLineOffsets(true, false),
-    "false-true": generateLineOffsets(false, true),
-    "true-true": generateLineOffsets(true, true),
-} as const;
-
-function getLineOffsets(inputIsMappedOver?: boolean, outputIsMappedOver?: boolean) {
-    return lineOffsetDictionary[`${inputIsMappedOver ?? false}-${outputIsMappedOver ?? false}`];
-}
-
-function keyForIndex(index: number) {
-    return `${props.id ?? "no-key"}-${index}`;
-}
 </script>
 
 <template>
     <g :id="props.id" class="workflow-editor-drawable-connection">
         <path
-            v-for="(path, index) in paths"
+            v-for="(path, index) in maybeFrozenPaths"
             :key="keyForIndex(index)"
             :class="connectionClass"
             :d="path"

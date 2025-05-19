@@ -1,6 +1,6 @@
 import { computed, nextTick, ref, watch } from "vue";
 
-import { wait } from "@/utils/utils";
+import { useDataFreezeStore } from "@/stores/dataFreezeStore";
 
 /**
  * The svg state is rendered in 2 steps.
@@ -11,9 +11,11 @@ import { wait } from "@/utils/utils";
  */
 export type RenderState = "html" | "pre-render" | "svg";
 
-export function useRenderController(renderTimeout = 0) {
+export function useRenderController(workflowId: string) {
     const currentRenderState = ref<RenderState>("html");
     const renderDone = ref<boolean>(false);
+
+    const dataFreezeStore = useDataFreezeStore(workflowId);
 
     let asyncOperationId = 0;
 
@@ -24,10 +26,11 @@ export function useRenderController(renderTimeout = 0) {
         if (newRenderState === "html") {
             currentRenderState.value = "html";
         } else if (newRenderState === "svg" && currentRenderState.value !== "svg") {
+            // clear old frozen data
+            dataFreezeStore.reset();
             currentRenderState.value = "pre-render";
 
             await nextTick();
-            await wait(renderTimeout);
 
             if (currentOperationId === asyncOperationId) {
                 currentRenderState.value = "svg";

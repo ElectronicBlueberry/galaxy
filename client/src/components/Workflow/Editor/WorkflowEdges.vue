@@ -51,13 +51,14 @@ function id(connection: Connection) {
 <template>
     <SvgWrapper :render-state="props.renderState" class="workflow-edges">
         <SVGConnection
-            v-if="draggingConnection"
+            v-if="draggingConnection && props.renderState === 'html'"
             :connection="draggingConnection[0]"
             :terminal-position="draggingConnection[1]" />
         <SVGConnection
             v-for="connection in connections"
             :id="id(connection)"
             :key="key(connection)"
+            :render-state="props.renderState"
             :connection="connection" />
     </SvgWrapper>
 </template>

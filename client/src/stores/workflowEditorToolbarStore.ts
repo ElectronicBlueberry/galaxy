@@ -29,7 +29,7 @@ export interface InputCatcherEvent {
 
 export type WorkflowEditorToolbarStore = ReturnType<typeof useWorkflowEditorToolbarStore>;
 
-export const useWorkflowEditorToolbarStore = defineScopedStore("workflowEditorToolbarStore", () => {
+export const useWorkflowEditorToolbarStore = defineScopedStore("workflowEditorToolbarStore", (workflowId) => {
     const snapActive = useUserLocalStorage("workflow-editor-toolbar-snap-active", false);
     const currentTool = ref<EditorTool>("pointer");
     const inputCatcherActive = ref<boolean>(false);
@@ -101,7 +101,7 @@ export const useWorkflowEditorToolbarStore = defineScopedStore("workflowEditorTo
         });
     }
 
-    const { renderState } = useRenderController();
+    const { renderState } = useRenderController(workflowId);
 
     return {
         toolbarVisible,
